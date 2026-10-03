@@ -1,8 +1,9 @@
 const express = require("express");
 const router = express.Router();
-
+const { scanUrl } = require("./urlScanner");
 const { pool } = require("../db");
-
+const { scanPhone } = require("./phoneScanner");
+const { scanEmail } = require("./emailScanner");
 router.post("/", async (req, res) => {
 
     try {
@@ -20,7 +21,32 @@ router.post("/", async (req, res) => {
             });
 
         }
+        let scanResult;
 
+        if (inputType === "URL") {
+            scanResult = scanUrl(inputValue);
+        }
+
+        if (inputType === "PHONE") {
+            scanResult = scanPhone(inputValue);
+        }
+
+        if (inputType === "EMAIL") {
+            scanResult = scanEmail(inputValue);
+        }
+
+
+        // =================================================
+        // KIỂM TRA LOẠI DỮ LIỆU
+        // =================================================
+
+        if (
+            inputType !== "URL" && inputType !== "PHONE" && inputType !== "EMAIL") {
+            return res.status(400).json({
+                success: false,
+                message: "Loại dữ liệu không được hỗ trợ"
+            });
+        }
         // Lưu yêu cầu quét
         const [result] = await pool.execute(
             `INSERT INTO scan_requests
@@ -57,8 +83,22 @@ router.post("/", async (req, res) => {
         // 2. TÍNH ĐIỂM
         // =========================
 
-        let score = 0;
+        let ruleScore = 0;
 
+        if (
+            inputType === "URL" ||
+            inputType === "PHONE" ||
+            inputType === "EMAIL"
+        ) {
+            ruleScore = scanResult.ruleScore;
+        }
+
+
+        // Điểm cuối cùng
+        let score = ruleScore;
+
+
+        // Nếu nằm trong blacklist thì cho 100 điểm
         if (blacklistMatch) {
             score = 100;
         }
@@ -67,7 +107,7 @@ router.post("/", async (req, res) => {
         // 3. XÁC ĐỊNH RỦI RO
         // =========================
 
-        let riskLevel = "UNKNOWN";
+        let riskLevel = "LOW";
         let isScam = false;
 
         if (score >= 90) {
@@ -93,10 +133,22 @@ router.post("/", async (req, res) => {
         // 4. LƯU KẾT QUẢ
         // =========================
 
-        const explanation = blacklistMatch
-            ? "Dữ liệu đã được tìm thấy trong blacklist."
-            : "Chưa phát hiện dữ liệu trong blacklist.";
+        let explanation;
 
+        if (blacklistMatch) {
+
+            explanation = "Dữ liệu đã được tìm thấy trong blacklist.";
+
+        } else if (
+            (inputType === "URL" || inputType === "PHONE" || inputType === "EMAIL") && scanResult.reasons) {
+
+            explanation = scanResult.reasons.join(" ");
+
+        } else {
+
+            explanation = "Chưa phát hiện dấu hiệu đáng ngờ.";
+
+        }
         await pool.execute(
             `INSERT INTO detection_results
             (
@@ -117,7 +169,7 @@ router.post("/", async (req, res) => {
                 blacklistMatch
                     ? blacklist[0].id_blacklist
                     : null,
-                0,
+                ruleScore,
                 0,
                 score,
                 riskLevel,
@@ -146,6 +198,7 @@ router.post("/", async (req, res) => {
             success: true,
 
             data: {
+                ruleScore,
 
                 scanId,
 
