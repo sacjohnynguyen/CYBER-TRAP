@@ -20,9 +20,6 @@ app.get("/api/health", (req, res) => {
     });
 });
 
-app.use("/api/scan", scanRoutes);
-app.use("/api/blacklist", blacklistRoutes);
-app.use("/api/rules", rulesRoutes);
 
 const PORT = process.env.PORT || 3000;
 
