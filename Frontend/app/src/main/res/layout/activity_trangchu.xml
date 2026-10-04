@@ -254,7 +254,7 @@
                     android:id="@+id/tvCard2Icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="⚠️"
+                    android:text="⚠"
                     android:textSize="24sp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -297,7 +297,7 @@
                 android:background="@drawable/bg_card_pink"
                 android:padding="16dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/card4"
+                app:layout_constraintEnd_toStartOf="@id/cardGoiKhanCap"
                 app:layout_constraintHorizontal_weight="1"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/card1">
@@ -339,7 +339,7 @@
 
             <!-- Card 4 -->
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/card4"
+                android:id="@+id/cardGoiKhanCap"
                 android:layout_width="0dp"
                 android:layout_height="130dp"
                 android:layout_marginStart="8dp"
@@ -377,7 +377,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="113 — Cảnh sát kinh tế"
+                    android:text="0692.345.860 — Cảnh sát kinh tế"
                     android:textColor="#757575"
                     android:textSize="12sp"
                     app:layout_constraintEnd_toEndOf="parent"

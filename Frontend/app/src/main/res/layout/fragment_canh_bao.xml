@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F7F8FA">
+
+    <!-- HEADER -->
+
+
+    <!-- THANH CHỨC NĂNG -->
+
+
+    <!-- NỘI DUNG -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ScrollView
+            android:id="@+id/scrollView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="15dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+
+                <!-- CẢNH BÁO 1 -->
+                <TextView
+                    android:id="@+id/tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="20dp"
+                    android:text="Các lừa đảo mới được cộng đồng báo cáo."
+                    android:textColor="#787878"
+                    android:textSize="15dp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+                <EditText
+                    android:id="@+id/edt_tim_kiem_canh_bao"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="50dp"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginBottom="12dp"
+                    android:background="#F2F2F2"
+                    android:drawableStart="@android:drawable/ic_menu_search"
+                    android:drawablePadding="10dp"
+                    android:hint="Tìm kiếm số điện thoại, website..."
+                    android:inputType="textMultiLine"
+                    android:minLines="1"
+                    android:maxLines="3"
+                    android:paddingHorizontal="16dp"
+                    android:textSize="14sp" />
+
+                <Button
+                    android:id="@+id/btnCanhBao1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="10dp"
+                    android:backgroundTint="#FFFFFF"
+                    android:gravity="center_vertical|start"
+                    android:padding="15dp"
+                    android:text="📱  0987 654 321\n     Giả mạo ngân hàng\n     12 phút trước       🔴 NGUY HIỂM"
+                    android:textAllCaps="false"
+                    android:textColor="#263238"
+                    android:textSize="14sp" />
+
+
+                <!-- CẢNH BÁO 2 -->
+                <Button
+                    android:id="@+id/btnCanhBao2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="10dp"
+                    android:backgroundTint="#FFFFFF"
+                    android:gravity="center_vertical|start"
+                    android:padding="15dp"
+                    android:text="🌐  vay-tien-nhanh.net\n     Website giả mạo\n     5 phút trước        🔴 NGUY HIỂM"
+                    android:textAllCaps="false"
+                    android:textColor="#263238"
+                    android:textSize="14sp" />
+
+
+                <!-- CẢNH BÁO 3 -->
+                <Button
+                    android:id="@+id/btnCanhBao3"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="10dp"
+                    android:backgroundTint="#FFFFFF"
+                    android:gravity="center_vertical|start"
+                    android:padding="15dp"
+                    android:text="📱  0338 877 665\n     Giả mạo công an\n     30 phút trước      🔴 NGUY HIỂM"
+                    android:textAllCaps="false"
+                    android:textColor="#263238"
+                    android:textSize="14sp" />
+
+
+                <!-- CẢNH BÁO 4 -->
+                <Button
+                    android:id="@+id/btnCanhBao4"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="10dp"
+                    android:backgroundTint="#FFFFFF"
+                    android:gravity="center_vertical|start"
+                    android:padding="15dp"
+                    android:text="📱  0912 345 678\n     Lừa đảo đầu tư\n     2 giờ trước          🟡 ĐÁNG NGHI"
+                    android:textAllCaps="false"
+                    android:textColor="#263238"
+                    android:textSize="14sp" />
+
+
+                <!-- CẢNH BÁO 5 -->
+                <Button
+                    android:id="@+id/btnCanhBao5"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="10dp"
+                    android:backgroundTint="#FFFFFF"
+                    android:gravity="center_vertical|start"
+                    android:padding="15dp"
+                    android:text="🏦  MB Bank: 09283746...\n     Chuyển khoản lừa đảo\n     3 giờ trước          🔴 NGUY HIỂM"
+                    android:textAllCaps="false"
+                    android:textColor="#263238"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+
+        </ScrollView>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
