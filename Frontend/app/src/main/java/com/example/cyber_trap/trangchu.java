@@ -1,4 +1,4 @@
-package com.example.s2;
+package com.example.cyber_trap;
 
 import android.content.Intent;
 import android.net.Uri;

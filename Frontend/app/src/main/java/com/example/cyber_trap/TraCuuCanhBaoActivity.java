@@ -1,4 +1,4 @@
-package com.example.s2;
+package com.example.cyber_trap;
 
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;

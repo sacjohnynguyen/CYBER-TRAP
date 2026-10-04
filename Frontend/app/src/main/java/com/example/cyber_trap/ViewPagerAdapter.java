@@ -1,4 +1,4 @@
-package com.example.s2;
+package com.example.cyber_trap;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
