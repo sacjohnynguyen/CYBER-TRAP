@@ -1,8 +1,15 @@
 const express = require("express");
 const router = express.Router();
+<<<<<<< HEAD:scan.routes.js
 
 const { pool } = require("../db");
 
+=======
+const { scanUrl } = require("./urlScanner");
+const { pool } = require("./db");
+const { scanPhone } = require("./phoneScanner");
+const { scanEmail } = require("./emailScanner");
+>>>>>>> d330622 (thay file dp thành db và kết nối được database):Backend/CYBER-TRAP/scan.routes.js
 router.post("/", async (req, res) => {
 
     try {
