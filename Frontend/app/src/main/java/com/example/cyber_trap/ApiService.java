@@ -11,4 +11,8 @@ public interface ApiService {
 
     @POST("api/v1/auth/register")
     Call<RegisterResponse> register(@Body RegisterRequest registerRequest);
+
+    // Sprint 2: Quét & Tra cứu lừa đảo (SĐT, Email, Link, Nội dung)
+    @POST("api/v1/scan")
+    Call<ScanResponseWrapper> scanScam(@Body ScanRequest scanRequest);
 }
