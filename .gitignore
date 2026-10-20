@@ -34,3 +34,6 @@ google-services.json
 *.hprof
 #env
 .env
+.env.*
+root.env
+!.env.example
