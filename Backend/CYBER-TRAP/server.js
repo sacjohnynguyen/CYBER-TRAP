@@ -1,17 +1,18 @@
-require("dotenv").config();
+require("dotenv").config({
+    path: require("path").join(__dirname, "root.env")
+});
 
 const express = require("express");
 const cors = require("cors");
 
 const { testConnection } = require("./db");
-const scanRoutes = require("./routes/scan.routes");
-const blacklistRoutes = require("./routes/blacklist.routes");
-const rulesRoutes = require("./routes/rules.routes");
+const scanRoutes = require("./scan.routes");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use("/api/scan", scanRoutes);
 
 app.get("/api/health", (req, res) => {
     res.json({
@@ -33,6 +34,7 @@ async function startServer() {
 
     } catch (error) {
         console.error("❌ Không kết nối được MySQL:", error.message);
+        process.exitCode = 1;
     }
 }
 

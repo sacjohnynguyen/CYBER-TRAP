@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { scanUrl } = require("./urlScanner");
-const { pool } = require("../db");
+const { pool } = require("./db");
 const { scanPhone } = require("./phoneScanner");
 const { scanEmail } = require("./emailScanner");
 router.post("/", async (req, res) => {
