@@ -1,69 +1,71 @@
-package com.example.cyber_trap;
+package com.example.doannhom;
 
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 public class trangchu extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_trangchu);
 
-        // Xử lý giao diện tràn viền
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+        ScrollView scrollView = findViewById(R.id.scrollView);
 
-        // --------------------------------------------------------
-        // 1. XỬ LÝ CHUYỂN TRANG
-        // --------------------------------------------------------
-        View cardTraCuu = findViewById(R.id.card1);
+        // 1. Ánh xạ các thẻ tính năng
+        ConstraintLayout card1 = findViewById(R.id.card1);
+        ConstraintLayout card2 = findViewById(R.id.card2);
+        ConstraintLayout card3 = findViewById(R.id.card3);
+        ConstraintLayout cardGoiKhanCap = findViewById(R.id.cardGoiKhanCap);
 
-        // Chỉ xử lý nhấn vào mục "Tra cứu lừa đảo"
-        cardTraCuu.setOnClickListener(v -> {
-            Intent intent = new Intent(trangchu.this, TraCuuCanhBaoActivity.class);
-            intent.putExtra("TAB_INDEX", 0); // Gửi cờ vị trí số 0 (Tab Tra Cứu)
-            startActivity(intent);
-        });
+        // 2. Ánh xạ thanh điều hướng bên dưới
+        LinearLayout navHome = findViewById(R.id.navHome);
+        LinearLayout navSearch = findViewById(R.id.navSearch);
+        LinearLayout navCall = findViewById(R.id.navCall);
 
-        // Tạm thời đóng băng tính năng của thẻ "Cảnh báo mới" để làm sau
-        /*
-        View cardCanhBao = findViewById(R.id.card2);
-        cardCanhBao.setOnClickListener(v -> {
-            Intent intent = new Intent(trangchu.this, TraCuuCanhBaoActivity.class);
-            intent.putExtra("TAB_INDEX", 1);
-            startActivity(intent);
-        });
-        */
+        if (navHome != null && scrollView != null) {
+            navHome.setOnClickListener(v -> scrollView.smoothScrollTo(0, 0));
+        }
 
-        // --------------------------------------------------------
-        // 2. SỰ KIỆN GỌI ĐIỆN THOẠI KHẨN CẤP
-        // --------------------------------------------------------
-        View cardGoiKhanCap = findViewById(R.id.cardGoiKhanCap);
+        // Sự kiện mở trang Tra cứu lừa đảo theo Tab
+        if (card1 != null) {
+            card1.setOnClickListener(v -> openMainActivityWithTab(1));
+        }
+        if (card2 != null) {
+            card2.setOnClickListener(v -> openMainActivityWithTab(3));
+        }
+        if (card3 != null) {
+            card3.setOnClickListener(v -> openMainActivityWithTab(2));
+        }
+        if (navSearch != null) {
+            navSearch.setOnClickListener(v -> openMainActivityWithTab(1));
+        }
 
-        cardGoiKhanCap.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Số điện thoại đường dây nóng
-                String phoneInput = "0692345860";
+        // Sự kiện gọi điện khẩn cấp
+        View.OnClickListener callListener = v -> {
+            Intent callIntent = new Intent(Intent.ACTION_DIAL);
+            callIntent.setData(Uri.parse("tel:0692345860"));
+            startActivity(callIntent);
+        };
 
-                // Sử dụng cấu trúc Intent của bài giảng
-                Intent intent = new Intent(Intent.ACTION_DIAL);
-                intent.setData(Uri.parse("tel:" + phoneInput));
-                startActivity(intent);
-            }
-        });
+        if (cardGoiKhanCap != null) {
+            cardGoiKhanCap.setOnClickListener(callListener);
+        }
+        if (navCall != null) {
+            navCall.setOnClickListener(callListener);
+        }
+    }
+
+    private void openMainActivityWithTab(int tabIndex) {
+        Intent intent = new Intent(trangchu.this, GiaoDienTraCuu.class);
+        intent.putExtra("TAB_INDEX", tabIndex);
+        startActivity(intent);
     }
 }
