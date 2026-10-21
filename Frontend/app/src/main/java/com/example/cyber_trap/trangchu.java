@@ -1,4 +1,4 @@
-package com.example.doannhom;
+package com.example.cyber_trap;
 
 import android.content.Intent;
 import android.net.Uri;
