@@ -32,5 +32,11 @@ google-services.json
 
 # Android Profiling
 *.hprof
+
 #env
 .env
+
+# Local database credentials
+root.env
+
+
