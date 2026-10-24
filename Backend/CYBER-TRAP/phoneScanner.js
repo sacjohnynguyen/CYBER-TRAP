@@ -12,9 +12,11 @@ function scanPhone(inputPhone) {
     // Xóa khoảng trắng, dấu chấm, dấu gạch ngang
     let phone = inputPhone.trim().replace(/[\s.-]/g, "");
 
-    // Chuyển +84 thành 0
+    // Chuyển mã quốc gia Việt Nam thành đầu số 0
     if (phone.startsWith("+84")) {
         phone = "0" + phone.substring(3);
+    } else if (phone.startsWith("84")) {
+        phone = "0" + phone.substring(2);
     }
 
     // Kiểm tra số điện thoại Việt Nam

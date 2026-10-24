@@ -37,11 +37,24 @@ function scanUrl(inputUrl) {
     // thì tự thêm https://
     // ----------------------------------------------
 
-    if (!/^https?:\/\//i.test(url)) {
-
-        url = "https://" + url;
-
+   if (!/^https?:\/\//i.test(url)) {
+    // Chỉ tự thêm giao thức khi đầu vào trông giống hostname.
+    if (
+        !/^[a-z0-9.-]+\.[a-z]{2,}(?::\d+)?(?:[/?#]|$)/i.test(url) &&
+        !/^localhost(?::\d+)?(?:[/?#]|$)/i.test(url) &&
+        !/^\d{1,3}(?:\.\d{1,3}){3}(?::\d+)?(?:[/?#]|$)/.test(url)
+    ) {
+        return {
+            valid: false,
+            ruleScore: 0,
+            riskLevel: "UNKNOWN",
+            isSuspicious: false,
+            reasons: ["URL không đúng định dạng"]
+        };
     }
+
+    url = "https://" + url;
+}
 
 
     // ==================================================
@@ -403,24 +416,16 @@ function scanUrl(inputUrl) {
     // ==================================================
 
     return {
-
-        valid: true,
-
-        normalizedUrl: url,
-
-        hostname: hostname,
-
-        protocol: protocol,
-
-        ruleScore: score,
-
-        riskLevel: riskLevel,
-
-        isSuspicious: isSuspicious,
-
-        reasons: reasons
-
-    };
+    valid: true,
+    normalizedUrl: url,
+    hostname: hostname,
+    protocol: protocol,
+    ruleScore: score,
+    riskLevel: riskLevel,
+    isSuspicious: isSuspicious,
+    reasons: reasons,
+    matchedKeywords: keywordFound
+};
 
 }
 

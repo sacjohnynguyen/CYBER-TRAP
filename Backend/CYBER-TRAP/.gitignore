@@ -32,3 +32,11 @@ google-services.json
 
 # Android Profiling
 *.hprof
+<<<<<<< HEAD
+=======
+#env
+.env
+
+# Local database credentials
+root.env
+>>>>>>> 0cf7017 (Fix backend scanners and scan API)
