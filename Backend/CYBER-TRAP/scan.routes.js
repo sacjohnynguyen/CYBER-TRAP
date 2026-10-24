@@ -1,3 +1,4 @@
+
 const express = require("express");
 const router = express.Router();
 
@@ -7,6 +8,7 @@ const { scanEmail } = require("./emailScanner");
 const { pool } = require("./db");
 
 const SUPPORTED_TYPES = ["URL", "PHONE", "EMAIL"];
+
 
 // POST /api/scan
 router.post("/", async (req, res) => {
