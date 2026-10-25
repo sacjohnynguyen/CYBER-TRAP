@@ -1,3 +1,4 @@
+
 require("dotenv").config({
     path: require("path").join(__dirname, "root.env")
 });
@@ -12,6 +13,7 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+
 app.use("/api/scan", scanRoutes);
 
 app.get("/api/health", (req, res) => {
@@ -21,7 +23,6 @@ app.get("/api/health", (req, res) => {
     });
 });
 
-
 const PORT = process.env.PORT || 3000;
 
 async function startServer() {
@@ -29,11 +30,10 @@ async function startServer() {
         await testConnection();
 
         app.listen(PORT, "0.0.0.0", () => {
-            console.log(`🚀 Backend đang chạy tại port ${PORT}`);
+            console.log(`Backend đang chạy tại port ${PORT}`);
         });
-
     } catch (error) {
-        console.error("❌ Không kết nối được MySQL:", error.message);
+        console.error("Không kết nối được MySQL:", error.message);
         process.exitCode = 1;
     }
 }
