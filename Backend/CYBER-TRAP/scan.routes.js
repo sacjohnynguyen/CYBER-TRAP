@@ -9,7 +9,6 @@ const { pool } = require("./db");
 
 const SUPPORTED_TYPES = ["URL", "PHONE", "EMAIL"];
 
-
 // POST /api/scan
 router.post("/", async (req, res) => {
     try {
@@ -67,13 +66,13 @@ router.post("/", async (req, res) => {
                     inputValue: value,
                     valid: false,
                     riskLevel: "UNKNOWN",
-                    ruleScore: 0,
+                    isSuspicious: false,
                     reasons: scanResult?.reasons || []
                 }
             });
         }
 
-        // 5. Kiểm tra blacklist
+        // 5. Lưu yêu cầu quét vào database
         const [result] = await pool.execute(
             `INSERT INTO scan_requests
              (input_type, input_value, status)
@@ -83,6 +82,7 @@ router.post("/", async (req, res) => {
 
         const scanId = result.insertId;
 
+        // 6. Kiểm tra blacklist đã xác minh
         const [blacklist] = await pool.execute(
             `SELECT *
              FROM blacklist
@@ -95,76 +95,30 @@ router.post("/", async (req, res) => {
 
         const blacklistMatch = blacklist.length > 0;
 
-        // 6. Tính điểm cuối cùng
-        const ruleScore = Math.min(
-            100,
-            Math.max(0, Number(scanResult.ruleScore) || 0)
-        );
+        // 7. Xác định kết quả không sử dụng điểm số
+        const riskLevel = blacklistMatch
+            ? "CRITICAL"
+            : (scanResult.riskLevel || "UNKNOWN");
 
-        const score = blacklistMatch ? 100 : ruleScore;
+        const isScam = blacklistMatch;
 
-        // 7. Thống nhất ngưỡng rủi ro với các scanner
-        let riskLevel = "LOW";
-
-        if (score >= 80) {
-            riskLevel = "CRITICAL";
-        } else if (score >= 60) {
-            riskLevel = "HIGH";
-        } else if (score >= 30) {
-            riskLevel = "MEDIUM";
-        }
-
-        // Chỉ đánh dấu là scam nếu có trong blacklist đã xác minh
-        // hoặc điểm rule đạt ngưỡng CRITICAL.
-        const isScam = blacklistMatch || score >= 80;
+        const isSuspicious = blacklistMatch
+            ? true
+            : Boolean(scanResult.isSuspicious);
 
         // 8. Tạo giải thích
         let explanation;
 
         if (blacklistMatch) {
-            explanation = "Dữ liệu đã được tìm thấy trong blacklist.";
+            explanation =
+                "Dữ liệu đã được tìm thấy trong blacklist đã xác minh.";
         } else {
-            explanation = (scanResult.reasons || []).join(" ") ||
-                "Chưa phát hiện dấu hiệu đáng ngờ.";
+            explanation =
+                (scanResult.reasons || []).join(" ") ||
+                "Chưa có đủ thông tin để kết luận dữ liệu là lừa đảo.";
         }
 
-        // 9. Lưu kết quả phát hiện
-        await pool.execute(
-            `INSERT INTO detection_results
-             (
-                 scan_id,
-                 blacklist_match,
-                 matched_blacklist_id,
-                 rule_score,
-                 ai_score,
-                 final_score,
-                 risk_level,
-                 is_scam,
-                 explanation
-             )
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [
-                scanId,
-                blacklistMatch ? 1 : 0,
-                blacklistMatch ? blacklist[0].id_blacklist : null,
-                ruleScore,
-                0,
-                score,
-                riskLevel,
-                isScam ? 1 : 0,
-                explanation
-            ]
-        );
-
-        // 10. Cập nhật trạng thái lượt quét
-        await pool.execute(
-            `UPDATE scan_requests
-             SET status = 'COMPLETED'
-             WHERE scan_id = ?`,
-            [scanId]
-        );
-
-        // 11. Trả kết quả về Android
+        // 9. Trả kết quả
         return res.json({
             success: true,
             data: {
@@ -178,17 +132,14 @@ router.post("/", async (req, res) => {
                     value,
                 valid: scanResult.valid,
                 blacklistMatch,
-                ruleScore,
-                score,
                 riskLevel,
-                isSuspicious: scanResult.isSuspicious,
+                isSuspicious,
                 isScam,
                 reasons: scanResult.reasons || [],
                 matchedKeywords: scanResult.matchedKeywords || [],
                 explanation
             }
         });
-
     } catch (error) {
         console.error("Lỗi POST /api/scan:", error);
 

@@ -1,445 +1,141 @@
 
-// ======================================================
-// 1. HÀM KIỂM TRA URL
-// ======================================================
+const { URL } = require("url");
 
-function scanUrl(inputUrl) {
+function scanUrl(input) {
+    const reasons = [];
+    const matchedKeywords = [];
 
-    // ----------------------------------------------
-    // Kiểm tra dữ liệu đầu vào
-    // ----------------------------------------------
-
-    if (!inputUrl || typeof inputUrl !== "string") {
-
+    if (typeof input !== "string" || input.trim() === "") {
         return {
             valid: false,
-            ruleScore: 0,
             riskLevel: "UNKNOWN",
             isSuspicious: false,
-            reasons: [
-                "URL không hợp lệ"
-            ]
+            reasons: ["URL không được để trống"],
+            matchedKeywords
         };
-
     }
 
+    let url = input.trim();
 
-    // Xóa khoảng trắng ở đầu và cuối
-
-    let url = inputUrl.trim();
-
-
-    // ----------------------------------------------
-    // Nếu người dùng nhập:
-    //
-    // google.com
-    //
-    // thì tự thêm https://
-    // ----------------------------------------------
-
+    // Thêm giao thức https nếu người dùng chưa nhập
     if (!/^https?:\/\//i.test(url)) {
-        // Chỉ tự thêm giao thức khi đầu vào trông giống hostname.
-        if (
-            !/^[a-z0-9.-]+\.[a-z]{2,}(?::\d+)?(?:[/?#]|$)/i.test(url) &&
-            !/^localhost(?::\d+)?(?:[/?#]|$)/i.test(url) &&
-            !/^\d{1,3}(?:\.\d{1,3}){3}(?::\d+)?(?:[/?#]|$)/.test(url)
-        ) {
-            return {
-                valid: false,
-                ruleScore: 0,
-                riskLevel: "UNKNOWN",
-                isSuspicious: false,
-                reasons: ["URL không đúng định dạng"]
-            };
-        }
-
         url = "https://" + url;
     }
-
-
-    // ==================================================
-    // 2. PHÂN TÍCH URL
-    // ==================================================
 
     let parsedUrl;
 
     try {
-
         parsedUrl = new URL(url);
-
     } catch (error) {
-
         return {
             valid: false,
-            ruleScore: 0,
             riskLevel: "UNKNOWN",
             isSuspicious: false,
-            reasons: [
-                "URL không đúng định dạng"
-            ]
+            reasons: ["URL không hợp lệ"],
+            matchedKeywords
         };
-
     }
-
-
-    // ==================================================
-    // 3. LẤY THÔNG TIN URL
-    // ==================================================
-
-    const protocol = parsedUrl.protocol;
 
     const hostname = parsedUrl.hostname.toLowerCase();
+    const protocol = parsedUrl.protocol;
 
-    const pathname = parsedUrl.pathname.toLowerCase();
+    // Chỉ chấp nhận HTTP hoặc HTTPS
+    if (protocol !== "http:" && protocol !== "https:") {
+        return {
+            valid: false,
+            riskLevel: "UNKNOWN",
+            isSuspicious: false,
+            reasons: ["Giao thức URL không được hỗ trợ"],
+            matchedKeywords
+        };
+    }
 
-    const fullUrl = url.toLowerCase();
+    const fullUrl = parsedUrl.href.toLowerCase();
 
+    // 1. Kiểm tra địa chỉ IP được dùng làm tên miền
+    const isIPv4 = /^\d{1,3}(?:\.\d{1,3}){3}$/.test(hostname);
 
-    // Điểm rủi ro ban đầu
+    if (isIPv4) {
+        reasons.push("URL sử dụng địa chỉ IP thay vì tên miền");
+    }
 
-    let score = 0;
+    // 2. Kiểm tra tên miền có nhiều dấu gạch nối
+    const hyphenCount = (hostname.match(/-/g) || []).length;
 
+    if (hyphenCount >= 3) {
+        reasons.push("Tên miền có nhiều dấu gạch nối bất thường");
+    }
 
-    // Danh sách lý do tại sao URL bị cộng điểm
+    // 3. Kiểm tra tên miền có nhiều cấp phụ
+    const subdomainCount = hostname.split(".").length - 2;
 
-    let reasons = [];
+    if (subdomainCount >= 4) {
+        reasons.push("Tên miền có nhiều cấp tên miền phụ");
+    }
 
+    // 4. Kiểm tra ký tự @ trong URL
+    if (parsedUrl.username || parsedUrl.password || fullUrl.includes("@")) {
+        reasons.push("URL chứa ký tự hoặc thông tin đăng nhập đáng ngờ");
+    }
 
-
-    // ==================================================
-    // RULE 1: HTTP
-    // ==================================================
-    //
-    // HTTPS mã hóa kết nối.
-    //
-    // HTTP không tự động có nghĩa là lừa đảo,
-    // nhưng đây có thể là một dấu hiệu rủi ro.
-    //
-    // ==================================================
-
+    // 5. Kiểm tra URL sử dụng HTTP không mã hóa
     if (protocol === "http:") {
-
-        score += 10;
-
-        reasons.push(
-            "URL sử dụng HTTP thay vì HTTPS"
-        );
-
+        reasons.push("URL sử dụng HTTP thay vì HTTPS");
     }
 
-
-
-    // ==================================================
-    // RULE 2: URL SỬ DỤNG IP THAY CHO DOMAIN
-    // ==================================================
-    //
-    // Ví dụ:
-    //
-    // http://192.168.1.100/login
-    //
-    // Một số link lừa đảo có thể sử dụng IP trực tiếp.
-    //
-    // ==================================================
-
-    const ipRegex =
-        /^(?:\d{1,3}\.){3}\d{1,3}$/;
-
-
-    if (ipRegex.test(hostname)) {
-
-        score += 25;
-
-        reasons.push(
-            "URL sử dụng địa chỉ IP thay cho tên miền"
-        );
-
-    }
-
-
-
-    // ==================================================
-    // RULE 3: DOMAIN CÓ KÝ TỰ @
-    // ==================================================
-    //
-    // Ví dụ:
-    //
-    // https://google.com@evil.com
-    //
-    // Trình duyệt thực sự sẽ truy cập evil.com.
-    //
-    // Đây là dấu hiệu đáng chú ý.
-    //
-    // ==================================================
-
-    if (parsedUrl.username || parsedUrl.password) {
-
-        score += 25;
-
-        reasons.push(
-            "URL chứa thông tin đăng nhập hoặc ký tự @ đáng ngờ"
-        );
-
-    }
-
-
-
-    // ==================================================
-    // RULE 4: DOMAIN DÀI BẤT THƯỜNG
-    // ==================================================
-
-    if (hostname.length > 40) {
-
-        score += 10;
-
-        reasons.push(
-            "Tên miền dài bất thường"
-        );
-
-    }
-
-
-
-    // ==================================================
-    // RULE 5: URL QUÁ DÀI
-    // ==================================================
-
-    if (url.length > 150) {
-
-        score += 10;
-
-        reasons.push(
-            "URL có độ dài bất thường"
-        );
-
-    }
-
-
-
-    // ==================================================
-    // RULE 6: KIỂM TRA TỪ KHÓA ĐÁNG NGỜ
-    // ==================================================
-    //
-    // Đây chỉ là RULE hỗ trợ.
-    // Không nên kết luận một URL là lừa đảo
-    // chỉ vì nó chứa một từ khóa.
-    //
-    // ==================================================
-
+    // 6. Kiểm tra từ khóa thường xuất hiện trong URL lừa đảo
     const suspiciousKeywords = [
-
         "login",
-        "signin",
         "verify",
         "verification",
-        "secure",
-        "security",
         "account",
-        "update",
-        "confirm",
         "password",
         "bank",
-        "payment",
         "wallet",
+        "secure",
+        "update",
+        "confirm",
         "gift",
-        "bonus",
-        "free",
         "prize",
-        "reward"
-
+        "bonus",
+        "claim",
+        "free",
+        "urgent",
+        "suspended",
+        "payment"
     ];
-
-
-    let keywordFound = [];
-
 
     for (const keyword of suspiciousKeywords) {
-
         if (fullUrl.includes(keyword)) {
-
-            keywordFound.push(keyword);
-
+            matchedKeywords.push(keyword);
         }
-
     }
 
-
-    // Nếu có từ khóa đáng ngờ
-
-    if (keywordFound.length > 0) {
-
-        // Tối đa cộng 20 điểm
-        // để tránh URL chứa quá nhiều keyword
-        // bị cộng điểm quá lớn.
-
-        const keywordScore =
-            Math.min(keywordFound.length * 5, 20);
-
-        score += keywordScore;
-
-
+    if (matchedKeywords.length > 0) {
         reasons.push(
-            "URL chứa từ khóa thường xuất hiện trong các trang yêu cầu đăng nhập/xác minh"
+            "URL chứa từ khóa cần chú ý: " + matchedKeywords.join(", ")
         );
-
     }
 
+    // Xác định kết quả dựa trên dấu hiệu, không tính điểm
+    const isSuspicious = reasons.length > 0;
 
-
-    // ==================================================
-    // RULE 7: DOMAIN DÙNG PUNYCODE
-    // ==================================================
-    //
-    // Punycode thường bắt đầu bằng:
-    //
-    // xn--
-    //
-    // Nó không có nghĩa chắc chắn là lừa đảo,
-    // nhưng có thể được sử dụng trong một số
-    // kiểu giả mạo tên miền.
-    //
-    // ==================================================
-
-    if (hostname.includes("xn--")) {
-
-        score += 15;
-
-        reasons.push(
-            "Tên miền sử dụng Punycode"
-        );
-
+    if (!isSuspicious) {
+        reasons.push("Chưa phát hiện dấu hiệu đáng ngờ từ các quy tắc cơ bản");
     }
 
-
-
-    // ==================================================
-    // RULE 8: SHORTENER
-    // ==================================================
-    //
-    // Một số dịch vụ rút gọn URL làm cho
-    // người dùng khó nhìn thấy domain đích.
-    //
-    // ==================================================
-
-    const shortenerDomains = [
-
-        "bit.ly",
-        "tinyurl.com",
-        "t.co",
-        "is.gd",
-        "cutt.ly",
-        "rebrand.ly"
-
-    ];
-
-
-    if (shortenerDomains.includes(hostname)) {
-
-        score += 10;
-
-        reasons.push(
-            "URL sử dụng dịch vụ rút gọn link"
-        );
-
-    }
-
-
-
-    // ==================================================
-    // 4. GIỚI HẠN ĐIỂM
-    // ==================================================
-
-    if (score > 100) {
-
-        score = 100;
-
-    }
-
-
-
-    // ==================================================
-    // 5. XÁC ĐỊNH MỨC ĐỘ RỦI RO
-    // ==================================================
-
-    let riskLevel = "LOW";
-
-
-    if (score >= 80) {
-
-        riskLevel = "CRITICAL";
-
-    }
-
-    else if (score >= 60) {
-
-        riskLevel = "HIGH";
-
-    }
-
-    else if (score >= 30) {
-
-        riskLevel = "MEDIUM";
-
-    }
-
-    else {
-
-        riskLevel = "LOW";
-
-    }
-
-
-
-    // ==================================================
-    // 6. XÁC ĐỊNH CÓ DẤU HIỆU ĐÁNG NGỜ HAY KHÔNG
-    // ==================================================
-
-    const isSuspicious = score >= 30;
-
-
-
-    // ==================================================
-    // 7. NẾU KHÔNG CÓ DẤU HIỆU
-    // ==================================================
-
-    if (reasons.length === 0) {
-
-        reasons.push(
-            "Chưa phát hiện dấu hiệu đáng ngờ từ các rule cơ bản"
-        );
-
-    }
-
-
-
-    // ==================================================
-    // 8. TRẢ KẾT QUẢ
-    // ==================================================
+    const riskLevel = isSuspicious ? "MEDIUM" : "LOW";
 
     return {
         valid: true,
-        normalizedUrl: url,
-        hostname: hostname,
-        protocol: protocol,
-        ruleScore: score,
-        riskLevel: riskLevel,
-        isSuspicious: isSuspicious,
-        reasons: reasons,
-        matchedKeywords: keywordFound
+        normalizedUrl: parsedUrl.href,
+        hostname,
+        protocol,
+        riskLevel,
+        isSuspicious,
+        reasons,
+        matchedKeywords
     };
-
 }
 
-
-
-// ======================================================
-// EXPORT FUNCTION
-// ======================================================
-//
-// scan.routes.js sẽ import hàm này bằng:
-//
-// const { scanUrl } = require("./urlScanner");
-// ======================================================
-
-module.exports = {
-    scanUrl
-};
+module.exports = { scanUrl };

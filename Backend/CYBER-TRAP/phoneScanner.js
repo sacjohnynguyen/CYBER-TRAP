@@ -1,82 +1,61 @@
+
 function scanPhone(inputPhone) {
     if (!inputPhone || typeof inputPhone !== "string") {
         return {
             valid: false,
-            ruleScore: 0,
+            normalizedPhone: "",
             riskLevel: "UNKNOWN",
             isSuspicious: false,
             reasons: ["Số điện thoại không hợp lệ"]
         };
     }
 
-    // Xóa khoảng trắng, dấu chấm, dấu gạch ngang
-    let phone = inputPhone.trim().replace(/[\s.-]/g, "");
+    // Chuẩn hóa số điện thoại
+    let phone = inputPhone.trim().replace(/[\s().-]/g, "");
 
-    // Chuyển mã quốc gia Việt Nam thành đầu số 0
+    // Chuyển mã quốc gia Việt Nam về đầu số 0
     if (phone.startsWith("+84")) {
         phone = "0" + phone.substring(3);
     } else if (phone.startsWith("84")) {
         phone = "0" + phone.substring(2);
     }
 
-    // Kiểm tra số điện thoại Việt Nam
-    const phoneRegex = /^0(3|5|7|8|9)[0-9]{8}$/;
+    // Kiểm tra số điện thoại cố định: mã vùng 024 hoặc 028
+    if (/^0(24|28)[0-9]{7}$/.test(phone)) {
+        return {
+            valid: true,
+            normalizedPhone: phone,
+            riskLevel: "MEDIUM",
+            isSuspicious: true,
+            reasons: [
+                "Số điện thoại cố định thuộc mã vùng 024 hoặc 028. Cần xác minh người gọi; mã vùng không tự chứng minh lừa đảo."
+            ]
+        };
+    }
 
-    if (!phoneRegex.test(phone)) {
+    // Kiểm tra số điện thoại di động Việt Nam gồm 10 chữ số
+    const mobileRegex = /^0(3|5|7|8|9)[0-9]{8}$/;
+
+    if (!mobileRegex.test(phone)) {
         return {
             valid: false,
             normalizedPhone: phone,
-            ruleScore: 0,
             riskLevel: "UNKNOWN",
             isSuspicious: false,
             reasons: ["Số điện thoại không đúng định dạng Việt Nam"]
         };
     }
 
-    let score = 0;
-    let reasons = [];
-
-    // Kiểm tra số lặp bất thường
-    const digits = phone.substring(1);
-
-    if (/(\d)\1{5,}/.test(digits)) {
-        score += 20;
-        reasons.push("Số điện thoại chứa nhiều chữ số lặp lại");
-    }
-
-    // Kiểm tra các mẫu số quá đơn giản
-    if (/^0(3|5|7|8|9)12345678$/.test(phone)) {
-        score += 20;
-        reasons.push("Số điện thoại có chuỗi số đơn giản bất thường");
-    }
-
-    if (score > 100) {
-        score = 100;
-    }
-
-    let riskLevel = "LOW";
-
-    if (score >= 80) {
-        riskLevel = "CRITICAL";
-    } else if (score >= 60) {
-        riskLevel = "HIGH";
-    } else if (score >= 30) {
-        riskLevel = "MEDIUM";
-    }
-
-    const isSuspicious = score >= 30;
-
-    if (reasons.length === 0) {
-        reasons.push("Chưa phát hiện dấu hiệu đáng ngờ từ các rule cơ bản");
-    }
-
+    // Số hợp lệ không đồng nghĩa với số an toàn.
+    // Chưa có bằng chứng thì không kết luận lừa đảo.
     return {
         valid: true,
         normalizedPhone: phone,
-        ruleScore: score,
-        riskLevel,
-        isSuspicious,
-        reasons
+        riskLevel: "LOW",
+        isSuspicious: false,
+        reasons: [
+            "Số điện thoại đúng định dạng. Chưa có đủ thông tin để kết luận đây là số lừa đảo."
+        ]
     };
 }
 
