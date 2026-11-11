@@ -14,28 +14,49 @@
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.Cyber_Trap">
+
+        <!-- Màn hình Đăng nhập (Màn hình khởi động) -->
         <activity
             android:name=".LoginActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".SignupActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".TrangChuActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".GiaoDienTraCuu"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
+        <!-- === CÁC MÀN HÌNH MỚI COPY TỪ PROJECT TEST SANG === -->
+        <activity
+            android:name=".BaoCaoActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".LichSuBaoCaoActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".ChiTietBaoCaoActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
     </application>
 
 </manifest>

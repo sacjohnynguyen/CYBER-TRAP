@@ -40,7 +40,8 @@ public class TrangChuActivity extends AppCompatActivity {
         // 2. Ánh xạ thanh điều hướng bên dưới
         LinearLayout navHome = findViewById(R.id.navHome);
         LinearLayout navSearch = findViewById(R.id.navSearch);
-        LinearLayout navCall = findViewById(R.id.navCall);
+        LinearLayout navBaoCao = findViewById(R.id.navBaoCao);
+        LinearLayout navWarningNav = findViewById(R.id.navWarningNav); // Đã đổi từ navCall sang navWarningNav
 
         if (navHome != null && scrollView != null) {
             navHome.setOnClickListener(v -> scrollView.smoothScrollTo(0, 0));
@@ -53,14 +54,35 @@ public class TrangChuActivity extends AppCompatActivity {
         if (card2 != null) {
             card2.setOnClickListener(v -> openMainActivityWithTab(3));
         }
-        if (card3 != null) {
-            card3.setOnClickListener(v -> openMainActivityWithTab(2));
-        }
         if (navSearch != null) {
             navSearch.setOnClickListener(v -> openMainActivityWithTab(1));
         }
 
-        // Sự kiện gọi điện khẩn cấp
+        // ==========================================
+        // Chuyển sang màn hình Gửi Báo Cáo
+        // ==========================================
+        if (card3 != null) {
+            card3.setOnClickListener(v -> {
+                Intent intent = new Intent(TrangChuActivity.this, BaoCaoActivity.class);
+                startActivity(intent);
+            });
+        }
+
+        if (navBaoCao != null) {
+            navBaoCao.setOnClickListener(v -> {
+                Intent intent = new Intent(TrangChuActivity.this, BaoCaoActivity.class);
+                startActivity(intent);
+            });
+        }
+
+        // ==========================================
+        // Sự kiện Cảnh báo (Mở tab Cảnh báo mới)
+        // ==========================================
+        if (navWarningNav != null) {
+            navWarningNav.setOnClickListener(v -> openMainActivityWithTab(3));
+        }
+
+        // Sự kiện gọi điện khẩn cấp (chỉ còn áp dụng cho thẻ đỏ Gọi Khẩn Cấp)
         View.OnClickListener callListener = v -> {
             Intent callIntent = new Intent(Intent.ACTION_DIAL);
             callIntent.setData(Uri.parse("tel:0692345860"));
@@ -69,9 +91,6 @@ public class TrangChuActivity extends AppCompatActivity {
 
         if (cardGoiKhanCap != null) {
             cardGoiKhanCap.setOnClickListener(callListener);
-        }
-        if (navCall != null) {
-            navCall.setOnClickListener(callListener);
         }
     }
 
