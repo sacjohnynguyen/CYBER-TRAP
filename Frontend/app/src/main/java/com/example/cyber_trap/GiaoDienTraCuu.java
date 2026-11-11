@@ -24,8 +24,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class GiaoDienTraCuu extends AppCompatActivity {
 
@@ -118,7 +124,7 @@ public class GiaoDienTraCuu extends AppCompatActivity {
         View navHome = findViewById(R.id.navHome);
         if (navHome != null) {
             navHome.setOnClickListener(v -> {
-                Intent intent = new Intent(GiaoDienTraCuu.this, trangchu.class);
+                Intent intent = new Intent(GiaoDienTraCuu.this, TrangChuActivity.class);
                 startActivity(intent);
                 finish();
             });
@@ -181,23 +187,40 @@ public class GiaoDienTraCuu extends AppCompatActivity {
             public void afterTextChanged(Editable s) {}
         });
 
+        // Gọi API Backend thật cho SĐT
         btnLookup.setOnClickListener(v -> {
             String input = etLookupInput.getText().toString().trim();
-
-            if (input.equals("0987654321") || input.equals("0912345678")) {
-                showPhoneDangerResult(
-                        input,
-                        "Giả mạo ngân hàng",
-                        "247 lần",
-                        "Xưng nhân viên VietcomBank, yêu cầu cung cấp OTP."
-                );
-            } else {
-                showPhoneSafeResult(
-                        input,
-                        "Không có báo cáo",
-                        "Không tìm thấy thông tin lừa đảo. Vẫn nên cẩn thận khi giao dịch."
-                );
+            if (input.isEmpty()) {
+                Toast.makeText(this, "Vui lòng nhập số điện thoại!", Toast.LENGTH_SHORT).show();
+                return;
             }
+
+            btnLookup.setEnabled(false);
+            btnLookup.setText("Đang quét...");
+
+            executeApiScan("PHONE", input, new ScanApiCallback() {
+                @Override
+                public void onSuccess(ScanResponse data) {
+                    btnLookup.setEnabled(true);
+                    btnLookup.setText("Tra cứu");
+                    if (data.isScam() || Boolean.TRUE.equals(data.getBlacklistMatch()) || "CRITICAL".equalsIgnoreCase(data.getRiskLevel()) || "HIGH".equalsIgnoreCase(data.getRiskLevel())) {
+                        String typeStr = data.getCategory() != null ? data.getCategory() : "Số điện thoại nghi vấn";
+                        String reportCount = data.getTotalReports() > 0 ? data.getTotalReports() + " lần" : "Đã xác minh";
+                        String desc = data.getMessage() != null ? data.getMessage() : "Số điện thoại có trong danh sách cảnh báo lừa đảo.";
+                        showPhoneDangerResult(input, typeStr, reportCount, desc);
+                    } else {
+                        String desc = data.getMessage() != null ? data.getMessage() : "Không tìm thấy thông tin lừa đảo. Vẫn nên cẩn thận khi giao dịch.";
+                        showPhoneSafeResult(input, "Không có báo cáo", desc);
+                    }
+                }
+
+                @Override
+                public void onError(String errorMsg) {
+                    btnLookup.setEnabled(true);
+                    btnLookup.setText("Tra cứu");
+                    Toast.makeText(GiaoDienTraCuu.this, errorMsg, Toast.LENGTH_SHORT).show();
+                }
+            });
         });
 
         // =====================================================================
@@ -249,34 +272,40 @@ public class GiaoDienTraCuu extends AppCompatActivity {
             public void afterTextChanged(Editable s) {}
         });
 
+        // Gọi API Backend thật cho Gmail
         btnLookupEmail.setOnClickListener(v -> {
             String email = etEmailInput.getText().toString().trim();
-            String lowerEmail = email.toLowerCase();
-
             if (!email.contains("@")) {
                 Toast.makeText(this, "Vui lòng nhập đúng định dạng địa chỉ Email!", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            // Kiểm tra mẫu cho địa chỉ Gmail
-            if (lowerEmail.equals("hotro.nhanthuong@gmail.com")
-                    || lowerEmail.equals("abc@gmail.com")
-                    || lowerEmail.contains("nhanthuong")
-                    || lowerEmail.contains("scam")
-                    || lowerEmail.contains("luadao")) {
-                showEmailDangerResult(
-                        email,
-                        "Giả mạo trúng thưởng / Ngân hàng",
-                        "185 lần",
-                        "Gửi email thông báo trúng thưởng giả mạo hoặc phát tán đường dẫn đánh cắp thông tin đăng nhập và mã OTP."
-                );
-            } else {
-                showEmailSafeResult(
-                        email,
-                        "Không có báo cáo",
-                        "Địa chỉ Gmail này chưa từng bị báo cáo lừa đảo. Tuy nhiên vẫn nên cẩn trọng với các tệp đính kèm lạ."
-                );
-            }
+            btnLookupEmail.setEnabled(false);
+            btnLookupEmail.setText("Đang quét...");
+
+            executeApiScan("EMAIL", email, new ScanApiCallback() {
+                @Override
+                public void onSuccess(ScanResponse data) {
+                    btnLookupEmail.setEnabled(true);
+                    btnLookupEmail.setText("Tra cứu");
+                    if (data.isScam() || Boolean.TRUE.equals(data.getBlacklistMatch()) || "CRITICAL".equalsIgnoreCase(data.getRiskLevel()) || "HIGH".equalsIgnoreCase(data.getRiskLevel())) {
+                        String typeStr = data.getCategory() != null ? data.getCategory() : "Email nghi vấn";
+                        String reportCount = data.getTotalReports() > 0 ? data.getTotalReports() + " lần" : "Đã xác minh";
+                        String desc = data.getMessage() != null ? data.getMessage() : "Địa chỉ Email có trong danh sách cảnh báo lừa đảo.";
+                        showEmailDangerResult(email, typeStr, reportCount, desc);
+                    } else {
+                        String desc = data.getMessage() != null ? data.getMessage() : "Địa chỉ Email này chưa từng bị báo cáo lừa đảo. Tuy nhiên vẫn nên cẩn trọng với các tệp đính kèm lạ.";
+                        showEmailSafeResult(email, "Không có báo cáo", desc);
+                    }
+                }
+
+                @Override
+                public void onError(String errorMsg) {
+                    btnLookupEmail.setEnabled(true);
+                    btnLookupEmail.setText("Tra cứu");
+                    Toast.makeText(GiaoDienTraCuu.this, errorMsg, Toast.LENGTH_SHORT).show();
+                }
+            });
         });
 
         // =====================================================================
@@ -314,15 +343,37 @@ public class GiaoDienTraCuu extends AppCompatActivity {
 
         btnClearUrl.setOnClickListener(v -> etUrl.setText(""));
 
+        // Gọi API Backend thật cho Website
         btnCheckSafety.setOnClickListener(v -> {
             String rawInput = etUrl.getText().toString().trim();
+            if (rawInput.isEmpty()) {
+                Toast.makeText(this, "Vui lòng nhập đường dẫn website!", Toast.LENGTH_SHORT).show();
+                return;
+            }
             String domain = extractDomain(rawInput);
 
-            if (domain.contains("vay-tien-nhanh") || domain.contains("lua-dao") || domain.contains("scam")) {
-                showWebDangerResult(domain);
-            } else {
-                showWebSafeResult(domain);
-            }
+            btnCheckSafety.setEnabled(false);
+            btnCheckSafety.setText("Đang quét...");
+
+            executeApiScan("URL", rawInput, new ScanApiCallback() {
+                @Override
+                public void onSuccess(ScanResponse data) {
+                    btnCheckSafety.setEnabled(true);
+                    btnCheckSafety.setText("🛡  Kiểm tra độ an toàn");
+                    if (data.isScam() || Boolean.TRUE.equals(data.getBlacklistMatch()) || "CRITICAL".equalsIgnoreCase(data.getRiskLevel()) || "HIGH".equalsIgnoreCase(data.getRiskLevel())) {
+                        showWebDangerResult(domain);
+                    } else {
+                        showWebSafeResult(domain);
+                    }
+                }
+
+                @Override
+                public void onError(String errorMsg) {
+                    btnCheckSafety.setEnabled(true);
+                    btnCheckSafety.setText("🛡  Kiểm tra độ an toàn");
+                    Toast.makeText(GiaoDienTraCuu.this, errorMsg, Toast.LENGTH_SHORT).show();
+                }
+            });
         });
 
         // =====================================================================
@@ -393,13 +444,34 @@ public class GiaoDienTraCuu extends AppCompatActivity {
             cardTextResult.setVisibility(View.GONE);
         });
 
+        // Gọi API Backend thật cho Tin nhắn / Nội dung
         btnAnalyzeText.setOnClickListener(v -> {
             String content = etTextContent.getText().toString().trim();
             if (content.isEmpty()) {
                 Toast.makeText(this, "Vui lòng nhập nội dung cần phân tích!", Toast.LENGTH_SHORT).show();
                 return;
             }
-            analyzeTextContent(content);
+
+            btnAnalyzeText.setEnabled(false);
+            btnAnalyzeText.setText("Đang phân tích...");
+
+            executeApiScan("CONTENT", content, new ScanApiCallback() {
+                @Override
+                public void onSuccess(ScanResponse data) {
+                    btnAnalyzeText.setEnabled(true);
+                    btnAnalyzeText.setText("🛡️  Phân tích mức độ an toàn");
+                    displayApiTextResult(data);
+                }
+
+                @Override
+                public void onError(String errorMsg) {
+                    btnAnalyzeText.setEnabled(true);
+                    btnAnalyzeText.setText("🛡️  Phân tích mức độ an toàn");
+                    Toast.makeText(GiaoDienTraCuu.this, errorMsg, Toast.LENGTH_SHORT).show();
+                    // Nếu lỗi kết nối server, phân tích cục bộ tạm thời
+                    analyzeTextContent(content);
+                }
+            });
         });
 
         // Kiểm tra xem có nhận tab đầu tiên từ Trang chủ chuyển sang không
@@ -449,14 +521,110 @@ public class GiaoDienTraCuu extends AppCompatActivity {
         }
     }
 
-    // Các hàm mở trực tiếp (giữ lại nếu đội Backend muốn gọi)
+    // =========================================================================
+    // HÀM HỖ TRỢ GỌI API RETROFIT
+    // =========================================================================
+
+    private void executeApiScan(String type, String value, ScanApiCallback callback) {
+        ScanRequest request = new ScanRequest(type, value);
+        RetrofitClient.getApiService().scanScam(request).enqueue(new Callback<ScanResponseWrapper>() {
+            @Override
+            public void onResponse(Call<ScanResponseWrapper> call, Response<ScanResponseWrapper> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    callback.onSuccess(response.body().getData());
+                } else {
+                    String errorMsg = "Không thể kiểm tra vào lúc này!";
+                    try {
+                        if (response.errorBody() != null) {
+                            JSONObject jsonObject = new JSONObject(response.errorBody().string());
+                            errorMsg = jsonObject.optString("message", errorMsg);
+                        }
+                    } catch (Exception ignored) {}
+                    callback.onError(errorMsg);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ScanResponseWrapper> call, Throwable t) {
+                callback.onError("Lỗi kết nối máy chủ: " + t.getMessage());
+            }
+        });
+    }
+
+    private interface ScanApiCallback {
+        void onSuccess(ScanResponse data);
+        void onError(String errorMsg);
+    }
+
+    private void displayApiTextResult(ScanResponse data) {
+        int score = data.getRiskScore();
+        List<String> signs = data.getDetails() != null ? data.getDetails() : new ArrayList<>();
+
+        cardTextResult.setVisibility(View.VISIBLE);
+        tvTextRiskScore.setText(score + "/100");
+        pbTextRisk.setProgress(score);
+
+        String level = data.getRiskLevel() != null ? data.getRiskLevel().toUpperCase() : "SAFE";
+
+        if (data.isScam() || "CRITICAL".equals(level) || "HIGH".equals(level) || score >= 50) {
+            tvTextRiskIcon.setText("⚠");
+            tvTextRiskIcon.setTextColor(Color.parseColor("#D92D20"));
+            tvTextRiskBadge.setText("RỦI RO CAO");
+            tvTextRiskBadge.setTextColor(Color.parseColor("#B42318"));
+            tvTextRiskTitle.setText("Nguy cơ lừa đảo cao");
+            tvTextRiskTitle.setTextColor(Color.parseColor("#D92D20"));
+            tvTextRiskDesc.setText(data.getMessage() != null ? data.getMessage() : "Nội dung có nhiều dấu hiệu lừa đảo.");
+            tvTextRiskScore.setTextColor(Color.parseColor("#D92D20"));
+            pbTextRisk.setProgressTintList(ColorStateList.valueOf(Color.parseColor("#D92D20")));
+            layoutTextResultHeader.setBackgroundColor(Color.parseColor("#FFF5F5"));
+            cardTextResult.setStrokeColor(Color.parseColor("#FECDCA"));
+        } else if ("WARNING".equals(level) || "MEDIUM".equals(level) || score > 0) {
+            tvTextRiskIcon.setText("⚠");
+            tvTextRiskIcon.setTextColor(Color.parseColor("#D97706"));
+            tvTextRiskBadge.setText("CẢNH GIÁC");
+            tvTextRiskBadge.setTextColor(Color.parseColor("#B54708"));
+            tvTextRiskTitle.setText("Có dấu hiệu đáng ngờ");
+            tvTextRiskTitle.setTextColor(Color.parseColor("#D97706"));
+            tvTextRiskDesc.setText(data.getMessage() != null ? data.getMessage() : "Nội dung có chứa từ khóa nhạy cảm.");
+            tvTextRiskScore.setTextColor(Color.parseColor("#D97706"));
+            pbTextRisk.setProgressTintList(ColorStateList.valueOf(Color.parseColor("#D97706")));
+            layoutTextResultHeader.setBackgroundColor(Color.parseColor("#FFFAEB"));
+            cardTextResult.setStrokeColor(Color.parseColor("#FEDF89"));
+        } else {
+            tvTextRiskIcon.setText("✔");
+            tvTextRiskIcon.setTextColor(Color.parseColor("#027A48"));
+            tvTextRiskBadge.setText("AN TOÀN");
+            tvTextRiskBadge.setTextColor(Color.parseColor("#027A48"));
+            tvTextRiskTitle.setText("Chưa phát hiện rủi ro");
+            tvTextRiskTitle.setTextColor(Color.parseColor("#027A48"));
+            tvTextRiskDesc.setText("Nội dung hiện tại chưa có các dấu hiệu lừa đảo phổ biến.");
+            tvTextRiskScore.setTextColor(Color.parseColor("#027A48"));
+            pbTextRisk.setProgressTintList(ColorStateList.valueOf(Color.parseColor("#027A48")));
+            layoutTextResultHeader.setBackgroundColor(Color.parseColor("#ECFDF3"));
+            cardTextResult.setStrokeColor(Color.parseColor("#A6F4C5"));
+            if (signs.isEmpty()) {
+                signs.add("✓   Không tìm thấy từ khóa đe dọa hoặc yêu cầu cung cấp mã bảo mật");
+            }
+        }
+
+        tvSign1.setVisibility(signs.size() >= 1 ? View.VISIBLE : View.GONE);
+        if (signs.size() >= 1) tvSign1.setText(signs.get(0));
+
+        tvSign2.setVisibility(signs.size() >= 2 ? View.VISIBLE : View.GONE);
+        if (signs.size() >= 2) tvSign2.setText(signs.get(1));
+
+        tvSign3.setVisibility(signs.size() >= 3 ? View.VISIBLE : View.GONE);
+        if (signs.size() >= 3) tvSign3.setText(signs.get(2));
+    }
+
+    // Các hàm mở trực tiếp
     public void openLookupScreen() { selectLookupTab(1); }
     public void openEmailLookupScreen() { selectLookupTab(4); }
     public void openTextAnalyzerScreen() { selectLookupTab(2); }
     public void openWebScannerScreen() { selectLookupTab(3); }
 
     // =========================================================================
-    // HÀM XỬ LÝ PHÂN TÍCH VĂN BẢN
+    // HÀM XỬ LÝ PHÂN TÍCH VĂN BẢN CỤC BỘ (KHI KHÔNG CÓ MẠNG)
     // =========================================================================
 
     private void analyzeTextContent(String text) {
@@ -537,7 +705,7 @@ public class GiaoDienTraCuu extends AppCompatActivity {
     }
 
     // =========================================================================
-    // CÁC HÀM GIAO DIỆN ĐỂ ĐỘI BACKEND GỌI KHI CÓ KẾT QUẢ (SĐT, GMAIL, WEB)
+    // CÁC HÀM THAY ĐỔI GIAO DIỆN (SĐT, GMAIL, WEB)
     // =========================================================================
 
     // --- Tab 1: Số điện thoại ---

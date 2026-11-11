@@ -17,7 +17,7 @@
 
         <!-- Màn hình Đăng nhập (Màn hình khởi động) -->
         <activity
-            android:name=".login"
+            android:name=".LoginActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
@@ -27,17 +27,17 @@
         </activity>
 
         <activity
-            android:name=".signup"
+            android:name=".SignupActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
         <activity
-            android:name=".trangchu"
+            android:name=".TrangChuActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
         <activity
-            android:name=".TraCuuActivity"
+            android:name=".GiaoDienTraCuu"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
