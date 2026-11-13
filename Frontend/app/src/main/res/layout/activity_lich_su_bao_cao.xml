@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F8F9FA"
-    tools:context=".LichSuBaoCaoActivity">
+    tools:context=".LichSuBaoCaoActivity"
+    tools:ignore="HardcodedText,ContentDescription,SpUsage,Autofill,LabelFor,TouchTargetSizeCheck,VisualLintTextFieldSize,RtlSymmetry">
 
     <!-- Header -->
     <LinearLayout
@@ -49,15 +50,13 @@
             android:textSize="14sp" />
     </LinearLayout>
 
-    <!-- ĐÃ XÓA KHỐI NÚT LỌC Ở ĐÂY -->
-
     <RelativeLayout
         android:id="@+id/layoutResultCount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/layoutSearch"> <!-- Sửa ràng buộc lên layoutSearch -->
+        app:layout_constraintTop_toBottomOf="@id/layoutSearch">
 
         <TextView
             android:layout_width="wrap_content"
@@ -158,9 +157,6 @@
                             android:textColor="#E53935"
                             android:textSize="12sp"
                             android:textStyle="bold" />
-
-                        <!-- ĐÃ XÓA NHÃN TRẠNG THÁI Ở ĐÂY -->
-
                     </RelativeLayout>
 
                     <TextView

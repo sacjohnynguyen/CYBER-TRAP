@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F8F9FA"
-    tools:context=".ChiTietBaoCaoActivity">
+    tools:context=".ChiTietBaoCaoActivity"
+    tools:ignore="HardcodedText,ContentDescription,SpUsage,TouchTargetSizeCheck,UseAppTint">
 
     <LinearLayout
         android:id="@+id/headerChiTiet"
@@ -82,8 +83,6 @@
                             android:textColor="#212121"
                             android:textSize="16sp"
                             android:textStyle="bold" />
-
-                        <!-- ĐÃ XÓA NHÃN TRẠNG THÁI Ở ĐÂY -->
                     </RelativeLayout>
 
                     <View android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginVertical="12dp" android:background="#EAECF0" />
@@ -105,8 +104,6 @@
                         android:textStyle="bold" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-
-            <!-- ĐÃ XÓA CARD TIẾN TRÌNH XỬ LÝ Ở ĐÂY -->
 
             <!-- Card Thông tin đối tượng và Mô tả -->
             <com.google.android.material.card.MaterialCardView

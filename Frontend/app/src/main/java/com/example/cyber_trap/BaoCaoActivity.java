@@ -1,12 +1,19 @@
 package com.example.cyber_trap;
 
+import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -20,7 +27,13 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.mlkit.vision.common.InputImage;
+import com.google.mlkit.vision.text.Text;
+import com.google.mlkit.vision.text.TextRecognition;
+import com.google.mlkit.vision.text.TextRecognizer;
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -28,7 +41,6 @@ import java.util.Locale;
 
 public class BaoCaoActivity extends AppCompatActivity {
 
-    // === CÁC BIẾN STATIC ĐỂ TRUYỀN DỮ LIỆU SANG TRANG LỊCH SỬ VÀ CHI TIẾT ===
     public static boolean hasNewReport = false;
     public static String newReportType = "";
     public static String newReportDesc = "";
@@ -41,7 +53,6 @@ public class BaoCaoActivity extends AppCompatActivity {
     private LinearLayout btnChonAnh, layoutSelectedImages;
     private MaterialButton btnGuiBaoCao;
 
-    // CÁC BIẾN CHO GIAO DIỆN THÀNH CÔNG
     private View layoutForm;
     private LinearLayout layoutSuccess;
     private MaterialButton btnGuiBaoCaoKhac;
@@ -55,7 +66,6 @@ public class BaoCaoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bao_cao);
 
-        // Ánh xạ View cơ bản
         spnHinhThuc = findViewById(R.id.spnHinhThuc);
         etMoTa = findViewById(R.id.etMoTa);
         etDoiTuong = findViewById(R.id.etDoiTuong);
@@ -65,7 +75,6 @@ public class BaoCaoActivity extends AppCompatActivity {
         layoutSelectedImages = findViewById(R.id.layoutSelectedImages);
         btnGuiBaoCao = findViewById(R.id.btnGuiBaoCao);
 
-        // Ánh xạ layout Thành công
         layoutForm = findViewById(R.id.layoutForm);
         layoutSuccess = findViewById(R.id.layoutSuccess);
         btnGuiBaoCaoKhac = findViewById(R.id.btnGuiBaoCaoKhac);
@@ -93,7 +102,14 @@ public class BaoCaoActivity extends AppCompatActivity {
                 result -> {
                     if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                         Uri imageUri = result.getData().getData();
-                        if (imageUri != null) hienThiAnhDaChon(imageUri);
+                        if (imageUri != null) {
+                            try {
+                                hienThiVaCheMoAnh(imageUri);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                Toast.makeText(this, "Không thể đọc ảnh", Toast.LENGTH_SHORT).show();
+                            }
+                        }
                     }
                 }
         );
@@ -103,13 +119,12 @@ public class BaoCaoActivity extends AppCompatActivity {
                 Toast.makeText(this, "Chỉ được chọn tối đa 4 ảnh!", Toast.LENGTH_SHORT).show();
                 return;
             }
-            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            // ĐÃ SỬA: Thay đổi cách gọi Intent để chọn ảnh ổn định hơn trên máy ảo
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("image/*");
             imagePickerLauncher.launch(intent);
         });
 
-        // ===============================================
-        // NÚT GỬI BÁO CÁO: LƯU DỮ LIỆU & HIỂN THỊ THÀNH CÔNG
-        // ===============================================
         btnGuiBaoCao.setOnClickListener(v -> {
             String type = spnHinhThuc.getSelectedItem().toString();
             String target = etDoiTuong.getText().toString().trim();
@@ -120,13 +135,11 @@ public class BaoCaoActivity extends AppCompatActivity {
                 return;
             }
 
-            // Lưu dữ liệu vào biến toàn cục
             hasNewReport = true;
             newReportType = type;
             newReportDesc = desc.isEmpty() ? "Không có mô tả thêm." : desc;
             newReportDate = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date());
 
-            // Xóa rỗng form
             etDoiTuong.setText("");
             etMoTa.setText("");
             spnHinhThuc.setSelection(0);
@@ -135,24 +148,18 @@ public class BaoCaoActivity extends AppCompatActivity {
             imageCount = 0;
             tvImageCount.setText("0/4");
 
-            // ẨN FORM, HIỂN THỊ GIAO DIỆN THÀNH CÔNG
             if (layoutForm != null) layoutForm.setVisibility(View.GONE);
             if (layoutSuccess != null) layoutSuccess.setVisibility(View.VISIBLE);
         });
 
-        // NÚT GỬI BÁO CÁO KHÁC
         if (btnGuiBaoCaoKhac != null) {
             btnGuiBaoCaoKhac.setOnClickListener(v -> {
-                // Ẩn giao diện thành công, bật lại form
                 if (layoutSuccess != null) layoutSuccess.setVisibility(View.GONE);
                 if (layoutForm != null) layoutForm.setVisibility(View.VISIBLE);
-
-                // Xóa list ảnh đã gửi trước đó để gửi báo cáo mới
                 savedImageUris.clear();
             });
         }
 
-        // Điều hướng: Trang chủ
         LinearLayout navHomeBtn = findViewById(R.id.navHomeBtn);
         if (navHomeBtn != null) {
             navHomeBtn.setOnClickListener(v -> {
@@ -163,7 +170,6 @@ public class BaoCaoActivity extends AppCompatActivity {
             });
         }
 
-        // Điều hướng: Lịch sử
         LinearLayout navLichSuBtn = findViewById(R.id.navLichSuBtn);
         if (navLichSuBtn != null) {
             navLichSuBtn.setOnClickListener(v -> {
@@ -173,21 +179,93 @@ public class BaoCaoActivity extends AppCompatActivity {
         }
     }
 
-    private void hienThiAnhDaChon(Uri uri) {
-        savedImageUris.add(uri);
-
+    private ImageView createImageViewForGallery() {
         ImageView imageView = new ImageView(this);
+        // Đã sửa lỗi thiếu dấu nhân (*) ở đây
         int size = (int) (80 * getResources().getDisplayMetrics().density);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(size, size);
         params.setMargins(0, 0, 16, 0);
         imageView.setLayoutParams(params);
         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        imageView.setImageURI(uri);
         imageView.setClipToOutline(true);
         imageView.setBackgroundResource(R.drawable.bg_white_rounded);
+
         layoutSelectedImages.addView(imageView);
         layoutSelectedImages.setVisibility(View.VISIBLE);
         imageCount++;
         tvImageCount.setText(imageCount + "/4");
+
+        return imageView;
+    }
+
+    private void hienThiVaCheMoAnh(Uri uri) throws IOException {
+        savedImageUris.add(uri);
+
+        ImageView targetImageView = createImageViewForGallery();
+        Bitmap originalBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
+        Bitmap mutableBitmap = originalBitmap.copy(Bitmap.Config.ARGB_8888, true);
+        Canvas canvas = new Canvas(mutableBitmap);
+
+        Paint paint = new Paint();
+        paint.setColor(Color.BLACK);
+        paint.setStyle(Paint.Style.FILL);
+
+        InputImage image = InputImage.fromBitmap(mutableBitmap, 0);
+        TextRecognizer recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
+
+        recognizer.process(image)
+                .addOnSuccessListener(visionText -> {
+                    boolean hasRedacted = false;
+
+                    for (Text.TextBlock block : visionText.getTextBlocks()) {
+                        for (Text.Line line : block.getLines()) {
+                            for (Text.Element element : line.getElements()) {
+                                String text = element.getText();
+
+                                // Sử dụng biểu thức Regex mạnh tay nhất để che mọi chữ số
+                                if (text.matches(".*\\d+.*")) {
+                                    Rect boundingBox = element.getBoundingBox();
+                                    if (boundingBox != null) {
+                                        boundingBox.left -= 5;
+                                        boundingBox.right += 5;
+                                        boundingBox.top -= 5;
+                                        boundingBox.bottom += 5;
+
+                                        canvas.drawRect(boundingBox, paint);
+                                        hasRedacted = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    targetImageView.setImageBitmap(mutableBitmap);
+                    targetImageView.setOnClickListener(v -> showImageDialog(mutableBitmap));
+
+                    if (hasRedacted) {
+                        Toast.makeText(this, "Đã tự động che OTP/CCCD!", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    targetImageView.setImageBitmap(originalBitmap);
+                    targetImageView.setOnClickListener(v -> showImageDialog(originalBitmap));
+                    Toast.makeText(this, "Lỗi quét ảnh: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void showImageDialog(Bitmap bitmap) {
+        Dialog dialog = new Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+
+        ImageView fullScreenImageView = new ImageView(this);
+        fullScreenImageView.setImageBitmap(bitmap);
+        fullScreenImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        fullScreenImageView.setLayoutParams(new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
+
+        fullScreenImageView.setOnClickListener(v -> dialog.dismiss());
+
+        dialog.setContentView(fullScreenImageView);
+        dialog.show();
     }
 }

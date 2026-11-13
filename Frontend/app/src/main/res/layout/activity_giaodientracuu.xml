@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F9FAFB"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context=".GiaoDienTraCuu"
+    tools:ignore="HardcodedText,ContentDescription,SpUsage,Autofill,LabelFor,TouchTargetSizeCheck,VisualLintTextFieldSize">
 
     <!-- 1. THANH TIÊU ĐỀ MÀU ĐỎ CỐ ĐỊNH Ở TRÊN CÙNG -->
     <LinearLayout
@@ -638,7 +641,7 @@
             </LinearLayout>
 
             <!-- =========================================================== -->
-            <!-- NỘI DUNG TAB 2: TRA CỨU GMAIL (MỚI THÊM THEO MẪU)           -->
+            <!-- NỘI DUNG TAB 2: TRA CỨU GMAIL                               -->
             <!-- =========================================================== -->
             <LinearLayout
                 android:id="@+id/layoutScreenEmail"
@@ -1090,7 +1093,6 @@
                                 android:layout_width="28dp"
                                 android:layout_height="28dp"
                                 android:background="?attr/selectableItemBackgroundBorderless"
-                                android:contentDescription="Xóa đường dẫn"
                                 android:src="@android:drawable/ic_menu_delete"
                                 android:visibility="gone"
                                 app:tint="#98A2B3" />
