@@ -41,7 +41,7 @@ public class TrangChuActivity extends AppCompatActivity {
         LinearLayout navHome = findViewById(R.id.navHome);
         LinearLayout navSearch = findViewById(R.id.navSearch);
         LinearLayout navBaoCao = findViewById(R.id.navBaoCao);
-        LinearLayout navWarningNav = findViewById(R.id.navWarningNav); // Đã đổi từ navCall sang navWarningNav
+        LinearLayout navWarningNav = findViewById(R.id.navWarningNav);
 
         if (navHome != null && scrollView != null) {
             navHome.setOnClickListener(v -> scrollView.smoothScrollTo(0, 0));
@@ -82,7 +82,7 @@ public class TrangChuActivity extends AppCompatActivity {
             navWarningNav.setOnClickListener(v -> openMainActivityWithTab(3));
         }
 
-        // Sự kiện gọi điện khẩn cấp (chỉ còn áp dụng cho thẻ đỏ Gọi Khẩn Cấp)
+        // Sự kiện gọi điện khẩn cấp
         View.OnClickListener callListener = v -> {
             Intent callIntent = new Intent(Intent.ACTION_DIAL);
             callIntent.setData(Uri.parse("tel:0692345860"));

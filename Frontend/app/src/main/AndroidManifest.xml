@@ -15,7 +15,7 @@
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.Cyber_Trap">
 
-        <!-- Màn hình Đăng nhập (Màn hình khởi động) -->
+        <!-- Đã trả màn hình Đăng nhập về làm màn hình khởi động chuẩn -->
         <activity
             android:name=".LoginActivity"
             android:exported="true"
@@ -31,6 +31,7 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
+        <!-- Màn hình Trang Chủ (Đã tắt intent-filter) -->
         <activity
             android:name=".TrangChuActivity"
             android:exported="false"
