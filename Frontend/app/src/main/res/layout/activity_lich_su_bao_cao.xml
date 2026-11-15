@@ -88,6 +88,7 @@
         app:layout_constraintTop_toBottomOf="@id/layoutResultCount">
 
         <LinearLayout
+            android:id="@+id/layoutReportContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"

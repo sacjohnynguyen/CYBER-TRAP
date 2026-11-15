@@ -49,8 +49,45 @@ async function initDb() {
                 username VARCHAR(100) NOT NULL UNIQUE,
                 email VARCHAR(255) NOT NULL UNIQUE,
                 password_hash VARCHAR(255) NOT NULL,
+                role VARCHAR(20) NOT NULL DEFAULT 'USER',
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        `);
+
+        const [userColumns] = await pool.query(
+            `SELECT COLUMN_NAME
+             FROM INFORMATION_SCHEMA.COLUMNS
+             WHERE TABLE_SCHEMA = DATABASE()
+               AND TABLE_NAME = 'users'
+               AND COLUMN_NAME = 'role'`
+        );
+        const existingUserColumns = new Set(userColumns.map((column) => column.COLUMN_NAME));
+
+        if (!existingUserColumns.has("role")) {
+            await pool.query(
+                "ALTER TABLE users ADD COLUMN role VARCHAR(20) NOT NULL DEFAULT 'USER'"
+            );
+        }
+
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS scam_report_review_queue (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT NULL,
+                target_value VARCHAR(255) NOT NULL,
+                target_type VARCHAR(50) NOT NULL DEFAULT 'PHONE',
+                scam_category VARCHAR(100) NOT NULL,
+                description TEXT NULL,
+                lost_amount DECIMAL(15,2) NOT NULL DEFAULT 0.00,
+                status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+                scam_report_id INT NULL UNIQUE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                INDEX idx_scam_review_user_created (user_id, created_at, id),
+                INDEX idx_scam_review_status (status, created_at),
+                CONSTRAINT fk_scam_review_user
+                    FOREIGN KEY (user_id) REFERENCES users(id)
+                    ON DELETE SET NULL
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
         `);
 
@@ -78,7 +115,7 @@ async function initDb() {
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
         `);
 
-        console.log("✅ Các bảng CSDL (users, scan_requests, blacklist) đã sẵn sàng.");
+        console.log("✅ Các bảng CSDL (users, scam_report_review_queue, scan_requests, blacklist) đã sẵn sàng.");
     } catch (error) {
         console.error("⚠️ Không thể tự động tạo bảng CSDL:", error.message);
     }

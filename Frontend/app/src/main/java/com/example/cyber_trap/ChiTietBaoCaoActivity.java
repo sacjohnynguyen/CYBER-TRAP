@@ -45,8 +45,12 @@ public class ChiTietBaoCaoActivity extends AppCompatActivity {
         TextView tvChiTietMoTa = findViewById(R.id.tvChiTietMoTa);
         TextView tvChiTietNgay = findViewById(R.id.tvChiTietNgay);
 
-        // Đổ dữ liệu từ màn hình Gửi Báo Cáo sang
-        if (BaoCaoActivity.hasNewReport) {
+        // Đổ dữ liệu từ Intent hoặc từ màn hình Gửi Báo Cáo sang
+        if (getIntent() != null && getIntent().hasExtra("REPORT_TYPE")) {
+            if (tvChiTietLoai != null) tvChiTietLoai.setText(getIntent().getStringExtra("REPORT_TYPE"));
+            if (tvChiTietMoTa != null) tvChiTietMoTa.setText(getIntent().getStringExtra("REPORT_DESC"));
+            if (tvChiTietNgay != null) tvChiTietNgay.setText(getIntent().getStringExtra("REPORT_DATE"));
+        } else if (BaoCaoActivity.hasNewReport) {
             if (tvChiTietLoai != null) tvChiTietLoai.setText(BaoCaoActivity.newReportType);
             if (tvChiTietMoTa != null) tvChiTietMoTa.setText(BaoCaoActivity.newReportDesc);
             if (tvChiTietNgay != null) tvChiTietNgay.setText(BaoCaoActivity.newReportDate);

@@ -26,8 +26,16 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.SharedPreferences;
 import com.google.android.material.button.MaterialButton;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.google.mlkit.vision.common.InputImage;
+
+import java.lang.reflect.Type;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
@@ -135,10 +143,45 @@ public class BaoCaoActivity extends AppCompatActivity {
                 return;
             }
 
+            String currentDate = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date());
             hasNewReport = true;
             newReportType = type;
             newReportDesc = desc.isEmpty() ? "Không có mô tả thêm." : desc;
-            newReportDate = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date());
+            newReportDate = currentDate;
+
+            // Lấy token & userId từ SharedPreferences
+            SharedPreferences prefs = getSharedPreferences("CyberTrapPrefs", MODE_PRIVATE);
+            String token = prefs.getString("ACCESS_TOKEN", null);
+            String loggedUser = prefs.getString("LOGGED_USER", "default");
+
+            String targetType = mapTargetType(type, target);
+            String finalDesc = desc.isEmpty() ? "Không có mô tả thêm." : desc;
+            ReportRequest request = new ReportRequest(target, targetType, type, finalDesc, 0);
+
+            // Lưu bộ nhớ đệm Local SharedPreferences làm dự phòng
+            saveReportToLocalCache(prefs, loggedUser, new ReportItem(0, target, targetType, type, finalDesc, "PENDING", currentDate));
+
+            // Gọi API Backend nếu có Token
+            if (token != null && !token.trim().isEmpty()) {
+                btnGuiBaoCao.setEnabled(false);
+                RetrofitClient.getApiService().createReport("Bearer " + token, request).enqueue(new Callback<ReportPostResponse>() {
+                    @Override
+                    public void onResponse(Call<ReportPostResponse> call, Response<ReportPostResponse> response) {
+                        btnGuiBaoCao.setEnabled(true);
+                        if (response.isSuccessful()) {
+                            Toast.makeText(BaoCaoActivity.this, "Đã gửi báo cáo thành công!", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(BaoCaoActivity.this, "Đã lưu báo cáo trên thiết bị.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ReportPostResponse> call, Throwable t) {
+                        btnGuiBaoCao.setEnabled(true);
+                        Toast.makeText(BaoCaoActivity.this, "Đã lưu báo cáo trên thiết bị.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
 
             etDoiTuong.setText("");
             etMoTa.setText("");
@@ -267,5 +310,30 @@ public class BaoCaoActivity extends AppCompatActivity {
 
         dialog.setContentView(fullScreenImageView);
         dialog.show();
+    }
+
+    private String mapTargetType(String type, String target) {
+        if (target != null) {
+            if (target.contains("@")) return "EMAIL";
+            if (target.matches("^\\+?[0-9]{8,15}$")) return "PHONE";
+            if (target.startsWith("http://") || target.startsWith("https://") || target.contains(".")) return "URL";
+        }
+        if (type != null && type.toLowerCase().contains("ngân hàng")) return "BANK_ACCOUNT";
+        return "CONTENT";
+    }
+
+    private void saveReportToLocalCache(SharedPreferences prefs, String username, ReportItem item) {
+        try {
+            String key = "CACHE_REPORTS_" + username;
+            String existingJson = prefs.getString(key, "[]");
+            Gson gson = new Gson();
+            Type listType = new TypeToken<ArrayList<ReportItem>>() {}.getType();
+            ArrayList<ReportItem> list = gson.fromJson(existingJson, listType);
+            if (list == null) list = new ArrayList<>();
+            list.add(0, item);
+            prefs.edit().putString(key, gson.toJson(list)).apply();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

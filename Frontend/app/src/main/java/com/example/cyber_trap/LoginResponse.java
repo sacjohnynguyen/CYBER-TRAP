@@ -5,6 +5,7 @@ public class LoginResponse {
     private String message;
     private String accessToken;
     private String refreshToken;
+    private UserData user;
 
     public LoginResponse() {
     }
@@ -19,5 +20,30 @@ public class LoginResponse {
 
     public String getRefreshToken() {
         return refreshToken;
+    }
+
+    public UserData getUser() {
+        return user;
+    }
+
+    public static class UserData {
+        private int id;
+        private String username;
+        private String email;
+
+        public UserData() {
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public String getEmail() {
+            return email;
+        }
     }
 }

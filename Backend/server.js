@@ -14,6 +14,8 @@ const cors = require("cors");
 const { testConnection, initDb } = require("./db");
 const scanRoutes = require("./scan.routes");
 const authRoutes = require("./auth.routes");
+const reportRoutes = require("./report.route");
+const adminReportRoutes = require("./admin.report.route");
 
 const app = express();
 
@@ -26,6 +28,12 @@ app.use("/api/auth", authRoutes);
 
 app.use("/api/v1/scan", scanRoutes);
 app.use("/api/scan", scanRoutes);
+
+app.use("/api/v1/reports", reportRoutes);
+app.use("/api/reports", reportRoutes);
+
+app.use("/api/v1/admin", adminReportRoutes);
+app.use("/api/admin", adminReportRoutes);
 
 app.get(["/api/health", "/api/v1/health"], (req, res) => {
     res.json({
