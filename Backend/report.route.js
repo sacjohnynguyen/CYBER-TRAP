@@ -3,8 +3,16 @@ const router = express.Router();
 const jwt = require("jsonwebtoken");
 const { pool } = require("./db");
 
-const SUPPORTED_TYPES = ["URL", "PHONE", "EMAIL", "CONTENT", "TEXT"];
+const SUPPORTED_TYPES = [
+    "URL",
+    "PHONE",
+    "EMAIL",
+    "BANK_ACCOUNT",
+    "CONTENT",
+    "TEXT"
+];
 const JWT_SECRET = process.env.JWT_SECRET || "cyber_trap_jwt_secret_key_2026";
+const MAX_LOST_AMOUNT = 9999999999999.99;
 
 function getAuthenticatedUserId(req) {
     const authorization = req.get("authorization");
@@ -25,6 +33,23 @@ function getAuthenticatedUserId(req) {
     } catch (error) {
         return null;
     }
+}
+
+function getLostAmount(value) {
+    if (value === undefined || value === null || value === "") {
+        return 0;
+    }
+    if (typeof value !== "number" && typeof value !== "string") {
+        return null;
+    }
+
+    const amountText = String(value).trim();
+    if (!/^\d+(?:\.\d{1,2})?$/.test(amountText)) {
+        return null;
+    }
+
+    const amount = Number(amountText);
+    return Number.isFinite(amount) && amount <= MAX_LOST_AMOUNT ? amount : null;
 }
 
 router.get("/user/:id", async (req, res) => {
@@ -53,7 +78,11 @@ router.get("/user/:id", async (req, res) => {
 
     try {
         const [users] = await pool.execute(
-            "SELECT id FROM users WHERE id = ? LIMIT 1",
+            `SELECT u.id, COALESCE(uts.trust_score, 100) AS trust_score
+             FROM users u
+             LEFT JOIN user_trust_score uts ON uts.user_id = u.id
+             WHERE u.id = ?
+             LIMIT 1`,
             [userId]
         );
         if (users.length === 0) {
@@ -64,8 +93,9 @@ router.get("/user/:id", async (req, res) => {
         }
 
         const [reports] = await pool.execute(
-            `SELECT id, input_type, input_value, reason, status, created_at
-             FROM reports
+            `SELECT id, target_value, target_type, scam_category, description,
+                    lost_amount, status, scam_report_id, created_at
+             FROM scam_report_review_queue
              WHERE user_id = ?
              ORDER BY created_at DESC, id DESC`,
             [userId]
@@ -73,12 +103,19 @@ router.get("/user/:id", async (req, res) => {
 
         return res.status(200).json({
             success: true,
+            trustScore: Number(users[0].trust_score),
             data: reports.map((report) => ({
                 reportId: report.id,
-                inputType: report.input_type,
-                inputValue: report.input_value,
-                reason: report.reason,
-                status: report.status,
+                scamReportId: report.scam_report_id,
+                targetValue: report.target_value,
+                targetType: report.target_type,
+                scamCategory: report.scam_category,
+                description: report.description,
+                lostAmount: report.lost_amount,
+                inputType: report.target_type,
+                inputValue: report.target_value,
+                reason: report.description,
+                status: String(report.status).toUpperCase(),
                 createdAt: report.created_at
             }))
         });
@@ -92,37 +129,81 @@ router.get("/user/:id", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-    const { inputType, inputValue, reason } = req.body || {};
+    const body = req.body || {};
+    const targetValue = typeof body.targetValue === "string"
+        ? body.targetValue.trim()
+        : typeof body.inputValue === "string"
+            ? body.inputValue.trim()
+            : "";
+    const targetTypeValue = typeof body.targetType === "string"
+        ? body.targetType
+        : body.inputType;
+    const rawScamCategory = body.scamCategory === undefined
+        ? body.category
+        : body.scamCategory;
+    const scamCategoryValue = rawScamCategory === undefined
+        ? "Khác"
+        : rawScamCategory;
+    const descriptionValue = body.description === undefined
+        ? body.reason
+        : body.description;
 
     if (
-        typeof inputType !== "string" ||
-        typeof inputValue !== "string" ||
-        typeof reason !== "string" ||
-        !inputType.trim() ||
-        !inputValue.trim() ||
-        !reason.trim()
+        !targetValue ||
+        typeof targetTypeValue !== "string" ||
+        !targetTypeValue.trim()
     ) {
         return res.status(400).json({
             success: false,
-            message: "Vui lòng cung cấp inputType, inputValue và reason hợp lệ."
+            message: "Vui lòng cung cấp targetValue và targetType hợp lệ."
         });
     }
 
-    const type = inputType.trim().toUpperCase();
-    const value = inputValue.trim();
-    const reportReason = reason.trim();
-
-    if (!SUPPORTED_TYPES.includes(type)) {
+    const targetType = targetTypeValue.trim().toUpperCase();
+    if (typeof scamCategoryValue !== "string") {
         return res.status(400).json({
             success: false,
-            message: "Loại dữ liệu không được hỗ trợ. Hỗ trợ: URL, PHONE, EMAIL, CONTENT, TEXT."
+            message: "scamCategory phải là chuỗi."
+        });
+    }
+    if (
+        descriptionValue !== undefined &&
+        descriptionValue !== null &&
+        typeof descriptionValue !== "string"
+    ) {
+        return res.status(400).json({
+            success: false,
+            message: "description phải là chuỗi."
         });
     }
 
-    if (value.length > 5000 || reportReason.length > 2000) {
+    const scamCategory = scamCategoryValue.trim();
+    const description = typeof descriptionValue === "string"
+        ? descriptionValue.trim()
+        : null;
+    const lostAmount = getLostAmount(body.lostAmount);
+
+    if (!SUPPORTED_TYPES.includes(targetType)) {
         return res.status(400).json({
             success: false,
-            message: "inputValue tối đa 5000 ký tự và reason tối đa 2000 ký tự."
+            message: "targetType không được hỗ trợ."
+        });
+    }
+    if (
+        targetValue.length > 255 ||
+        scamCategory.length === 0 ||
+        scamCategory.length > 100 ||
+        (description !== null && description.length > 1000)
+    ) {
+        return res.status(400).json({
+            success: false,
+            message: "Đối tượng tối đa 255 ký tự, hình thức 100 ký tự và mô tả 1.000 ký tự."
+        });
+    }
+    if (lostAmount === null) {
+        return res.status(400).json({
+            success: false,
+            message: "lostAmount phải là số không âm và có tối đa 2 chữ số thập phân."
         });
     }
 
@@ -150,19 +231,25 @@ router.post("/", async (req, res) => {
         }
 
         const [result] = await pool.execute(
-            `INSERT INTO reports (user_id, input_type, input_value, reason)
-             VALUES (?, ?, ?, ?)`,
-            [userId, type, value, reportReason]
+            `INSERT INTO scam_report_review_queue
+                (user_id, target_value, target_type, scam_category, description, lost_amount)
+             VALUES (?, ?, ?, ?, ?, ?)`,
+            [userId, targetValue, targetType, scamCategory, description, lostAmount]
         );
 
         return res.status(201).json({
             success: true,
-            message: "Gửi báo cáo thành công.",
+            message: "Báo cáo đã được gửi và đang chờ duyệt.",
             data: {
                 reportId: result.insertId,
-                inputType: type,
-                inputValue: value,
-                reason: reportReason,
+                targetValue,
+                targetType,
+                scamCategory,
+                description,
+                lostAmount,
+                inputType: targetType,
+                inputValue: targetValue,
+                reason: description,
                 status: "PENDING"
             }
         });

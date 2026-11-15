@@ -68,13 +68,16 @@ public class LoginActivity extends AppCompatActivity {
                     if (response.isSuccessful() && response.body() != null) {
                         LoginResponse loginResponse = response.body();
 
-                        // Lưu token & username vào SharedPreferences
+                        // Lưu token, username & userId vào SharedPreferences
                         SharedPreferences prefs = getSharedPreferences("CyberTrapPrefs", Context.MODE_PRIVATE);
                         SharedPreferences.Editor editor = prefs.edit();
                         if (loginResponse.getAccessToken() != null) {
                             editor.putString("ACCESS_TOKEN", loginResponse.getAccessToken());
                         }
                         editor.putString("LOGGED_USER", username);
+                        if (loginResponse.getUser() != null) {
+                            editor.putInt("USER_ID", loginResponse.getUser().getId());
+                        }
                         editor.apply();
 
                         String msg = loginResponse.getMessage() != null ? loginResponse.getMessage() : "Đăng nhập thành công!";
