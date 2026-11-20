@@ -16,6 +16,7 @@ const scanRoutes = require("./scan.routes");
 const authRoutes = require("./auth.routes");
 const reportRoutes = require("./report.route");
 const adminReportRoutes = require("./admin.report.route");
+const forumInteractionRoutes = require("./forum.interaction.route");
 
 const app = express();
 
@@ -34,6 +35,8 @@ app.use("/api/reports", reportRoutes);
 
 app.use("/api/v1/admin", adminReportRoutes);
 app.use("/api/admin", adminReportRoutes);
+
+app.use("/api/v1/posts", forumInteractionRoutes);
 
 app.get(["/api/health", "/api/v1/health"], (req, res) => {
     res.json({

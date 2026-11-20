@@ -15,20 +15,9 @@
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.Cyber_Trap">
 
-        <!-- Tạm tắt chạy đầu tiên để test -->
+        <!-- Đã trả màn hình Đăng nhập về làm màn hình khởi động chuẩn -->
         <activity
             android:name=".LoginActivity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
-
-        <activity
-            android:name=".SignupActivity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
-
-        <!-- Màn hình Trang Chủ (Đang cài đặt chạy đầu tiên để test Sprint 4) -->
-        <activity
-            android:name=".TrangChuActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
@@ -36,6 +25,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".SignupActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- Màn hình Trang Chủ -->
+        <activity
+            android:name=".TrangChuActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
 
         <activity
             android:name=".GiaoDienTraCuu"
