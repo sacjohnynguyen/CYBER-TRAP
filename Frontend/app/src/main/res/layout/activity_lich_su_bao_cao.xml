@@ -8,7 +8,7 @@
     tools:context=".LichSuBaoCaoActivity"
     tools:ignore="HardcodedText,ContentDescription,SpUsage,Autofill,LabelFor,TouchTargetSizeCheck,VisualLintTextFieldSize,RtlSymmetry">
 
-    <!-- Header -->
+    
     <LinearLayout
         android:id="@+id/headerLichSu"
         android:layout_width="match_parent"
@@ -76,7 +76,7 @@
             android:textSize="13sp" />
     </RelativeLayout>
 
-    <!-- Danh sách Báo cáo -->
+    
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -95,7 +95,7 @@
             android:paddingHorizontal="16dp"
             android:paddingBottom="24dp">
 
-            <!-- KHU VỰC TRỐNG -->
+            
             <LinearLayout
                 android:id="@+id/layoutEmptyState"
                 android:layout_width="match_parent"
@@ -129,7 +129,7 @@
                     android:textSize="14sp" />
             </LinearLayout>
 
-            <!-- ITEM BÁO CÁO -->
+            
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardBaoCaoItem1"
                 android:layout_width="match_parent"
@@ -219,7 +219,7 @@
         </LinearLayout>
     </ScrollView>
 
-    <!-- Bottom Navigation Bar -->
+    
     <LinearLayout
         android:id="@+id/bottomNavLichSu"
         android:layout_width="0dp"

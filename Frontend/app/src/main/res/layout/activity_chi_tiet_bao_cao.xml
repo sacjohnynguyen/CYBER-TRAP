@@ -50,7 +50,7 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Card Thông tin chung -->
+            
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -105,7 +105,7 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Card Thông tin đối tượng và Mô tả -->
+            
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -174,7 +174,7 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Card Ảnh bằng chứng -->
+            
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardAnhBangChung"
                 android:layout_width="match_parent"
