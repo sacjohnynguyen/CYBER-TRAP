@@ -8,7 +8,7 @@
     tools:context="com.example.cyber_trap.TrangChuActivity"
     tools:ignore="HardcodedText,ContentDescription,SpUsage">
 
-    <!-- Scrollable Body Content -->
+
     <ScrollView
         android:id="@+id/scrollView"
         android:layout_width="0dp"
@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:paddingBottom="24dp">
 
-            <!-- Header Background (Red) -->
+
             <View
                 android:id="@+id/headerBackground"
                 android:layout_width="0dp"
@@ -36,7 +36,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <!-- Header Title -->
+
             <TextView
                 android:id="@+id/tvHeaderTitle"
                 android:layout_width="wrap_content"
@@ -50,7 +50,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <!-- Header Subtitle -->
+
             <TextView
                 android:id="@+id/tvHeaderSubtitle"
                 android:layout_width="wrap_content"
@@ -62,15 +62,15 @@
                 app:layout_constraintStart_toStartOf="@id/tvHeaderTitle"
                 app:layout_constraintTop_toBottomOf="@id/tvHeaderTitle" />
 
-            <!-- Header Description -->
+
             <TextView
                 android:id="@+id/tvHeaderDesc"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="20dp"
-                android:paddingBottom="32dp"
                 android:lineSpacingExtra="3dp"
+                android:paddingBottom="32dp"
                 android:text="Tra cứu ngay số điện thoại, website hoặc tài khoản ngân hàng trước khi giao dịch."
                 android:textColor="#FFFFFF"
                 android:textSize="14sp"
@@ -78,7 +78,7 @@
                 app:layout_constraintStart_toStartOf="@id/tvHeaderTitle"
                 app:layout_constraintTop_toBottomOf="@id/tvHeaderSubtitle" />
 
-            <!-- Stat 1 -->
+
             <TextView
                 android:id="@+id/tvStat1Val"
                 android:layout_width="0dp"
@@ -107,7 +107,7 @@
                 app:layout_constraintStart_toStartOf="@id/tvStat1Val"
                 app:layout_constraintTop_toBottomOf="@id/tvStat1Val" />
 
-            <!-- Stat 2 -->
+
             <TextView
                 android:id="@+id/tvStat2Val"
                 android:layout_width="0dp"
@@ -135,7 +135,7 @@
                 app:layout_constraintStart_toStartOf="@id/tvStat2Val"
                 app:layout_constraintTop_toBottomOf="@id/tvStat2Val" />
 
-            <!-- Stat 3 -->
+
             <TextView
                 android:id="@+id/tvStat3Val"
                 android:layout_width="0dp"
@@ -173,7 +173,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tvStat1Label" />
 
-            <!-- Feature Header -->
+
             <TextView
                 android:id="@+id/tvFeatureHeader"
                 android:layout_width="wrap_content"
@@ -187,7 +187,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/divider1" />
 
-            <!-- Card 1 -->
+
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/card1"
                 android:layout_width="0dp"
@@ -236,7 +236,7 @@
                     app:layout_constraintTop_toBottomOf="@id/tvCard1Title" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <!-- Card 2 -->
+
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/card2"
                 android:layout_width="0dp"
@@ -284,7 +284,7 @@
                     app:layout_constraintTop_toBottomOf="@id/tvCard2Title" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <!-- Card 3 -->
+
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/card3"
                 android:layout_width="0dp"
@@ -333,7 +333,7 @@
                     app:layout_constraintTop_toBottomOf="@id/tvCard3Title" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <!-- Card 4 -->
+
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/cardGoiKhanCap"
                 android:layout_width="0dp"
@@ -381,7 +381,7 @@
                     app:layout_constraintTop_toBottomOf="@id/tvCard4Title" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <!-- System Status (Slogan Cộng Đồng) -->
+
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/cardSystemStatus"
                 android:layout_width="0dp"
@@ -391,8 +391,8 @@
                 android:layout_marginEnd="20dp"
                 android:layout_marginBottom="16dp"
                 android:background="@drawable/bg_white_rounded"
-                android:padding="16dp"
                 android:elevation="2dp"
+                android:padding="16dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -404,9 +404,9 @@
                     android:layout_height="wrap_content"
                     android:text="🛡️"
                     android:textSize="36sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/tvStatusTitle"
@@ -425,8 +425,8 @@
                     android:id="@+id/tvStatusDesc"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
                     android:layout_marginStart="16dp"
+                    android:layout_marginTop="4dp"
                     android:text="Mỗi báo cáo của bạn góp phần ngăn chặn lừa đảo và xây dựng không gian mạng an toàn hơn."
                     android:textColor="#757575"
                     android:textSize="13sp"
@@ -438,7 +438,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 
-    <!-- Bottom Navigation Bar (5 Mục) -->
+
     <LinearLayout
         android:id="@+id/bottomNav"
         android:layout_width="0dp"
@@ -498,7 +498,7 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/navBaoCao"
+            android:id="@+id/navDienDan"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -508,35 +508,13 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="📢"
+                android:text="💬"
                 android:textSize="18sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Báo cáo"
-                android:textColor="#757575"
-                android:textSize="10sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/navWarningNav"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="⚠️"
-                android:textSize="18sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Cảnh báo"
+                android:text="Diễn đàn"
                 android:textColor="#757575"
                 android:textSize="10sp" />
         </LinearLayout>
