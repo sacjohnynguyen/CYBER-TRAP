@@ -38,9 +38,9 @@ public class LichSuBaoCaoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lich_su_bao_cao);
 
-        // Ánh xạ Menu dưới
         LinearLayout navHomeBtnLichSu = findViewById(R.id.navHomeBtnLichSu);
         LinearLayout navBaoCaoBtnLichSu = findViewById(R.id.navBaoCaoBtnLichSu);
+        LinearLayout navProfile = findViewById(R.id.navProfile);
 
         if (navHomeBtnLichSu != null) {
             navHomeBtnLichSu.setOnClickListener(v -> {
@@ -54,6 +54,14 @@ public class LichSuBaoCaoActivity extends AppCompatActivity {
         if (navBaoCaoBtnLichSu != null) {
             navBaoCaoBtnLichSu.setOnClickListener(v -> {
                 Intent intent = new Intent(LichSuBaoCaoActivity.this, BaoCaoActivity.class);
+                startActivity(intent);
+                finish();
+            });
+        }
+
+        if (navProfile != null) {
+            navProfile.setOnClickListener(v -> {
+                Intent intent = new Intent(LichSuBaoCaoActivity.this, ProfileActivity.class);
                 startActivity(intent);
                 finish();
             });

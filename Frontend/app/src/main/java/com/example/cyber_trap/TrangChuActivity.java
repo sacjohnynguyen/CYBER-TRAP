@@ -38,6 +38,7 @@ public class TrangChuActivity extends AppCompatActivity {
 
         LinearLayout navHome = findViewById(R.id.navHome);
         LinearLayout navSearch = findViewById(R.id.navSearch);
+        LinearLayout navBaoCao = findViewById(R.id.navBaoCao);
         LinearLayout navDienDan = findViewById(R.id.navDienDan);
 
         if (navHome != null && scrollView != null) {
@@ -47,25 +48,35 @@ public class TrangChuActivity extends AppCompatActivity {
         if (card1 != null) {
             card1.setOnClickListener(v -> openMainActivityWithTab(1));
         }
-        if (card2 != null) {
-            card2.setOnClickListener(v -> openMainActivityWithTab(3));
-        }
+
         if (navSearch != null) {
             navSearch.setOnClickListener(v -> openMainActivityWithTab(1));
         }
 
-        if (card3 != null) {
-            card3.setOnClickListener(v -> {
-                Intent intent = new Intent(TrangChuActivity.this, BaoCaoActivity.class);
-                startActivity(intent);
-            });
+        View.OnClickListener openDienDanListener = v -> {
+            Intent intent = new Intent(TrangChuActivity.this, NewsFeedActivity.class);
+            startActivity(intent);
+        };
+
+        if (card2 != null) {
+            card2.setOnClickListener(openDienDanListener);
         }
 
         if (navDienDan != null) {
-            navDienDan.setOnClickListener(v -> {
-                Intent intent = new Intent(TrangChuActivity.this, NewsFeedActivity.class);
-                startActivity(intent);
-            });
+            navDienDan.setOnClickListener(openDienDanListener);
+        }
+
+        View.OnClickListener openBaoCaoListener = v -> {
+            Intent intent = new Intent(TrangChuActivity.this, BaoCaoActivity.class);
+            startActivity(intent);
+        };
+
+        if (card3 != null) {
+            card3.setOnClickListener(openBaoCaoListener);
+        }
+
+        if (navBaoCao != null) {
+            navBaoCao.setOnClickListener(openBaoCaoListener);
         }
 
         View.OnClickListener callListener = v -> {
@@ -76,6 +87,13 @@ public class TrangChuActivity extends AppCompatActivity {
 
         if (cardGoiKhanCap != null) {
             cardGoiKhanCap.setOnClickListener(callListener);
+        }
+        View navProfile = findViewById(R.id.navProfile);
+        if (navProfile != null) {
+            navProfile.setOnClickListener(v -> {
+                Intent intent = new Intent(this, ProfileActivity.class);
+                startActivity(intent);
+            });
         }
     }
 

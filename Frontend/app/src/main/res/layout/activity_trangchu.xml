@@ -254,7 +254,7 @@
                     android:id="@+id/tvCard2Icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="⚠️"
+                    android:text="💬"
                     android:textSize="24sp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -264,7 +264,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:text="Cảnh báo mới"
+                    android:text="Diễn đàn"
                     android:textColor="#212121"
                     android:textSize="15sp"
                     android:textStyle="bold"
@@ -276,7 +276,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="5 cảnh báo trong 1 giờ qua"
+                    android:text="Thảo luận &amp; chia sẻ cảnh báo"
                     android:textColor="#757575"
                     android:textSize="12sp"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -493,6 +493,28 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Tra cứu"
+                android:textColor="#757575"
+                android:textSize="10sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/navBaoCao"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📢"
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Báo cáo"
                 android:textColor="#757575"
                 android:textSize="10sp" />
         </LinearLayout>
