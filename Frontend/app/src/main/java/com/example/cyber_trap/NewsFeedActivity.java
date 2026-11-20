@@ -147,11 +147,28 @@ public class NewsFeedActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         });
+
         findViewById(R.id.navSearch).setOnClickListener(v -> {
             Intent intent = new Intent(this, GiaoDienTraCuu.class);
             intent.putExtra("TAB_INDEX", 1);
             startActivity(intent);
+            finish();
         });
+
+        View navBaoCao = findViewById(R.id.navBaoCao);
+        if (navBaoCao != null) {
+            navBaoCao.setOnClickListener(v -> {
+                Intent intent = new Intent(this, BaoCaoActivity.class);
+                startActivity(intent);
+            });
+        }
+        View navProfile = findViewById(R.id.navProfile);
+        if (navProfile != null) {
+            navProfile.setOnClickListener(v -> {
+                Intent intent = new Intent(this, ProfileActivity.class);
+                startActivity(intent);
+            });
+        }
     }
 
     @Override

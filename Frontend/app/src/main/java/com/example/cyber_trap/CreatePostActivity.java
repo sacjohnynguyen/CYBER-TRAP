@@ -29,12 +29,12 @@ import java.util.UUID;
 
 public class CreatePostActivity extends AppCompatActivity {
 
-    private EditText etPostTitle, etPostContent;
+    private EditText etPostTitle, etPostContent, etCustomTag;
     private TextView tvCharCount, tvHeaderCreateTitle, tvPrivacy;
     private MaterialButton btnSubmitPost;
     private GridLayout gridImagePreview;
 
-    private TextView tagBank, tagJob, tagPhishing, tagLoan, tagOtp;
+    private TextView tagBank, tagJob, tagPhishing, tagLoan, tagOtp, tagOther;
     private String selectedHashtag = "#GiaMaoNganHang";
     private String selectedPrivacy = "Công khai";
 
@@ -50,6 +50,7 @@ public class CreatePostActivity extends AppCompatActivity {
 
         etPostTitle = findViewById(R.id.etPostTitle);
         etPostContent = findViewById(R.id.etPostContent);
+        etCustomTag = findViewById(R.id.etCustomTag);
         tvCharCount = findViewById(R.id.tvCharCount);
         tvHeaderCreateTitle = findViewById(R.id.tvHeaderCreateTitle);
         tvPrivacy = findViewById(R.id.tvPrivacy);
@@ -61,6 +62,7 @@ public class CreatePostActivity extends AppCompatActivity {
         tagPhishing = findViewById(R.id.tagPhishing);
         tagLoan = findViewById(R.id.tagLoan);
         tagOtp = findViewById(R.id.tagOtp);
+        tagOther = findViewById(R.id.tagOther);
 
         findViewById(R.id.btnBackCreate).setOnClickListener(v -> finish());
 
@@ -100,6 +102,10 @@ public class CreatePostActivity extends AppCompatActivity {
         tagPhishing.setOnClickListener(v -> selectTag(tagPhishing, "Phishing Link", "#PhishingLink"));
         tagLoan.setOnClickListener(v -> selectTag(tagLoan, "Cho vay độc hại", "#ChoVayDocHai"));
         tagOtp.setOnClickListener(v -> selectTag(tagOtp, "Lừa đảo OTP", "#LuaDaoOTP"));
+        tagOther.setOnClickListener(v -> {
+            selectTag(tagOther, "Khác", "OTHER");
+            etCustomTag.requestFocus();
+        });
 
         multiImagePickerLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -150,7 +156,7 @@ public class CreatePostActivity extends AppCompatActivity {
             btnSubmitPost.setText("Lưu");
             etPostTitle.setText(post.title != null ? post.title : "");
             etPostContent.setText(post.content != null ? post.content : "");
-            selectedHashtag = post.tag != null ? post.tag : "#GiaMaoNganHang";
+            restoreTagSelection(post.tag);
             if (post.privacy != null) {
                 setPrivacyUI(post.privacy);
             }
@@ -172,6 +178,17 @@ public class CreatePostActivity extends AppCompatActivity {
                 title = content.length() > 45 ? content.substring(0, 45) + "..." : content;
             }
 
+            String finalHashtag = selectedHashtag;
+            if ("OTHER".equals(selectedHashtag)) {
+                String custom = etCustomTag.getText().toString().trim().replaceAll("\\s+", "");
+                if (custom.isEmpty()) {
+                    Toast.makeText(this, "Vui lòng nhập hashtag cho loại lừa đảo!", Toast.LENGTH_SHORT).show();
+                    etCustomTag.requestFocus();
+                    return;
+                }
+                finalHashtag = custom.startsWith("#") ? custom : "#" + custom;
+            }
+
             boolean isAnonymous = "Ẩn danh".equals(selectedPrivacy);
             String authorName = isAnonymous ? "Người dùng ẩn danh" : "Bảo Ngọc";
             String authorInitials = isAnonymous ? "ẨD" : "BN";
@@ -180,7 +197,7 @@ public class CreatePostActivity extends AppCompatActivity {
                 Post existing = NewsFeedActivity.allPosts.get(editPosition);
                 existing.title = title;
                 existing.content = content;
-                existing.tag = selectedHashtag;
+                existing.tag = finalHashtag;
                 existing.privacy = selectedPrivacy;
                 existing.authorName = authorName;
                 existing.authorInitials = authorInitials;
@@ -192,7 +209,7 @@ public class CreatePostActivity extends AppCompatActivity {
                         authorName,
                         authorInitials,
                         "Vừa xong",
-                        selectedHashtag,
+                        finalHashtag,
                         title,
                         content,
                         new ArrayList<>(selectedImageUris),
@@ -204,6 +221,23 @@ public class CreatePostActivity extends AppCompatActivity {
             }
             finish();
         });
+    }
+
+    private void restoreTagSelection(String tag) {
+        if (tag == null || "#GiaMaoNganHang".equals(tag)) {
+            selectTag(tagBank, "Giả mạo ngân hàng", "#GiaMaoNganHang");
+        } else if ("#ViecNheLuongCao".equals(tag)) {
+            selectTag(tagJob, "Việc nhẹ lương cao", "#ViecNheLuongCao");
+        } else if ("#PhishingLink".equals(tag)) {
+            selectTag(tagPhishing, "Phishing Link", "#PhishingLink");
+        } else if ("#ChoVayDocHai".equals(tag)) {
+            selectTag(tagLoan, "Cho vay độc hại", "#ChoVayDocHai");
+        } else if ("#LuaDaoOTP".equals(tag)) {
+            selectTag(tagOtp, "Lừa đảo OTP", "#LuaDaoOTP");
+        } else {
+            selectTag(tagOther, "Khác", "OTHER");
+            etCustomTag.setText(tag);
+        }
     }
 
     private void setPrivacyUI(String privacy) {
@@ -220,8 +254,8 @@ public class CreatePostActivity extends AppCompatActivity {
 
     private void selectTag(TextView activeView, String label, String hashtag) {
         selectedHashtag = hashtag;
-        TextView[] allTags = {tagBank, tagJob, tagPhishing, tagLoan, tagOtp};
-        String[] labels = {"Giả mạo ngân hàng", "Việc nhẹ lương cao", "Phishing Link", "Cho vay độc hại", "Lừa đảo OTP"};
+        TextView[] allTags = {tagBank, tagJob, tagPhishing, tagLoan, tagOtp, tagOther};
+        String[] labels = {"Giả mạo ngân hàng", "Việc nhẹ lương cao", "Phishing Link", "Cho vay độc hại", "Lừa đảo OTP", "Khác"};
 
         for (int i = 0; i < allTags.length; i++) {
             allTags[i].setBackgroundColor(Color.parseColor("#F5F5F5"));
@@ -232,6 +266,10 @@ public class CreatePostActivity extends AppCompatActivity {
         activeView.setBackgroundColor(Color.parseColor("#FFEBEE"));
         activeView.setTextColor(Color.parseColor("#D32F2F"));
         activeView.setText("✓ " + label);
+
+        if (etCustomTag != null) {
+            etCustomTag.setVisibility("OTHER".equals(hashtag) ? View.VISIBLE : View.GONE);
+        }
     }
 
     private void renderImageGrid() {

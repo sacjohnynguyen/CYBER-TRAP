@@ -10,7 +10,6 @@
     tools:context=".GiaoDienTraCuu"
     tools:ignore="HardcodedText,ContentDescription,SpUsage,Autofill,LabelFor,TouchTargetSizeCheck,VisualLintTextFieldSize">
 
-    
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -39,7 +38,6 @@
             android:textSize="14sp" />
     </LinearLayout>
 
-    
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -52,7 +50,6 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            
             <LinearLayout
                 android:id="@+id/layoutCategoryTabs"
                 android:layout_width="match_parent"
@@ -61,7 +58,6 @@
                 android:orientation="horizontal"
                 android:weightSum="4">
 
-                
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/tabPhone"
                     android:layout_width="0dp"
@@ -102,7 +98,6 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/tabEmail"
                     android:layout_width="0dp"
@@ -143,7 +138,6 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/tabWebsite"
                     android:layout_width="0dp"
@@ -184,7 +178,6 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/tabAccount"
                     android:layout_width="0dp"
@@ -226,9 +219,6 @@
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
-            
-            
-            
             <LinearLayout
                 android:id="@+id/layoutScreenTraCuu"
                 android:layout_width="match_parent"
@@ -236,7 +226,6 @@
                 android:orientation="vertical"
                 android:visibility="visible">
 
-                
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -302,7 +291,6 @@
                         app:cornerRadius="12dp" />
                 </LinearLayout>
 
-                
                 <LinearLayout
                     android:id="@+id/layoutQuickLookup"
                     android:layout_width="match_parent"
@@ -393,7 +381,6 @@
                     </LinearLayout>
                 </LinearLayout>
 
-                
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardResultSafe"
                     android:layout_width="match_parent"
@@ -496,7 +483,6 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardResultDanger"
                     android:layout_width="match_parent"
@@ -640,9 +626,6 @@
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
-            
-            
-            
             <LinearLayout
                 android:id="@+id/layoutScreenEmail"
                 android:layout_width="match_parent"
@@ -650,7 +633,6 @@
                 android:orientation="vertical"
                 android:visibility="gone">
 
-                
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -716,7 +698,6 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                
                 <LinearLayout
                     android:id="@+id/layoutQuickEmailLookup"
                     android:layout_width="match_parent"
@@ -778,7 +759,6 @@
                     </com.google.android.material.card.MaterialCardView>
                 </LinearLayout>
 
-                
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardEmailResultSafe"
                     android:layout_width="match_parent"
@@ -881,7 +861,6 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardEmailResultDanger"
                     android:layout_width="match_parent"
@@ -1025,9 +1004,6 @@
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
-            
-            
-            
             <LinearLayout
                 android:id="@+id/layoutScreenWeb"
                 android:layout_width="match_parent"
@@ -1035,7 +1011,6 @@
                 android:orientation="vertical"
                 android:visibility="gone">
 
-                
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -1116,7 +1091,6 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardStateDefault"
                     android:layout_width="match_parent"
@@ -1161,7 +1135,6 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardStateSafe"
                     android:layout_width="match_parent"
@@ -1272,7 +1245,6 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardStateDanger"
                     android:layout_width="match_parent"
@@ -1375,9 +1347,6 @@
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
-            
-            
-            
             <LinearLayout
                 android:id="@+id/layoutScreenText"
                 android:layout_width="match_parent"
@@ -1511,7 +1480,6 @@
                     app:backgroundTint="#DC2626"
                     app:cornerRadius="12dp" />
 
-                
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardTextResult"
                     android:layout_width="match_parent"
@@ -1731,25 +1699,27 @@
         </LinearLayout>
     </ScrollView>
 
-    
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#EAECF0" />
 
     <LinearLayout
+        android:id="@+id/bottomNav"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:background="#FFFFFF"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:weightSum="4">
+        android:weightSum="5">
 
         <LinearLayout
             android:id="@+id/navHome"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center"
             android:orientation="vertical">
 
@@ -1765,7 +1735,7 @@
                 android:layout_marginTop="2dp"
                 android:text="Trang chủ"
                 android:textColor="#667085"
-                android:textSize="11sp" />
+                android:textSize="10sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -1791,31 +1761,58 @@
                 android:layout_marginTop="2dp"
                 android:text="Tra cứu"
                 android:textColor="#D92D20"
-                android:textSize="11sp"
+                android:textSize="10sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/navWarning"
+            android:id="@+id/navBaoCao"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center"
             android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="⚠️"
+                android:text="📢"
                 android:textSize="18sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:text="Cảnh báo"
+                android:text="Báo cáo"
                 android:textColor="#667085"
-                android:textSize="11sp" />
+                android:textSize="10sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/navDienDan"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="💬"
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Diễn đàn"
+                android:textColor="#667085"
+                android:textSize="10sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -1823,6 +1820,8 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center"
             android:orientation="vertical">
 
@@ -1838,7 +1837,7 @@
                 android:layout_marginTop="2dp"
                 android:text="Cá nhân"
                 android:textColor="#667085"
-                android:textSize="11sp" />
+                android:textSize="10sp" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>
