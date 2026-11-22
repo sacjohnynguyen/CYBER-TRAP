@@ -35,15 +35,12 @@ import retrofit2.Response;
 
 public class GiaoDienTraCuu extends AppCompatActivity {
 
-    // Tiêu đề trên cùng và 4 khung nội dung hiển thị bên dưới 4 Tab
     private TextView tvHeaderTitle, tvHeaderSubtitle;
     private LinearLayout layoutScreenTraCuu, layoutScreenEmail, layoutScreenWeb, layoutScreenText;
 
-    // --- 4 TAB CHỌN DANH MỤC ---
     private MaterialCardView tabPhone, tabEmail, tabWebsite, tabAccount;
     private TextView tvTabPhone, tvTabEmail, tvTabWebsite, tvTabAccount;
 
-    // --- THÀNH PHẦN TAB 1: TRA CỨU SỐ ĐIỆN THOẠI (CHỈ NHẬP SỐ) ---
     private TextView tvSearchIcon;
     private EditText etLookupInput;
     private MaterialButton btnLookup;
@@ -52,7 +49,6 @@ public class GiaoDienTraCuu extends AppCompatActivity {
     private TextView tvSafePhone, tvSafeType, tvSafeDescription;
     private TextView tvDangerPhone, tvDangerType, tvDangerReportCount, tvDangerDescription;
 
-    // --- THÀNH PHẦN TAB 2: TRA CỨU GMAIL ---
     private TextView tvEmailSearchIcon;
     private EditText etEmailInput;
     private MaterialButton btnLookupEmail;
@@ -61,14 +57,12 @@ public class GiaoDienTraCuu extends AppCompatActivity {
     private TextView tvSafeEmail, tvSafeEmailType, tvSafeEmailDescription;
     private TextView tvDangerEmail, tvDangerEmailType, tvDangerEmailReportCount, tvDangerEmailDescription;
 
-    // --- THÀNH PHẦN TAB 3: QUÉT WEBSITE ---
     private EditText etUrl;
     private ImageButton btnClearUrl;
     private MaterialButton btnCheckSafety;
     private MaterialCardView cardStateDefault, cardStateSafe, cardStateDanger;
     private TextView tvSafeDomain, tvDangerDomain;
 
-    // --- THÀNH PHẦN TAB 4: PHÂN TÍCH TIN NHẮN (VĂN BẢN) ---
     private EditText etTextContent;
     private TextView tvCharCount, tvQuickPaste, tvTrySample, btnClearText;
     private MaterialButton btnAnalyzeText;
@@ -83,7 +77,6 @@ public class GiaoDienTraCuu extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_giaodientracuu);
 
-        // Ánh xạ tiêu đề và 4 khung nội dung bên dưới
         tvHeaderTitle = findViewById(R.id.tvHeaderTitle);
         tvHeaderSubtitle = findViewById(R.id.tvHeaderSubtitle);
         layoutScreenTraCuu = findViewById(R.id.layoutScreenTraCuu);
@@ -91,7 +84,6 @@ public class GiaoDienTraCuu extends AppCompatActivity {
         layoutScreenWeb = findViewById(R.id.layoutScreenWeb);
         layoutScreenText = findViewById(R.id.layoutScreenText);
 
-        // Ánh xạ 4 nút Tab
         tabPhone = findViewById(R.id.tabPhone);
         tabEmail = findViewById(R.id.tabEmail);
         tabWebsite = findViewById(R.id.tabWebsite);
@@ -102,25 +94,11 @@ public class GiaoDienTraCuu extends AppCompatActivity {
         tvTabWebsite = findViewById(R.id.tvTabWebsite);
         tvTabAccount = findViewById(R.id.tvTabAccount);
 
-        // Bấm vào từng Tab sẽ hiện nội dung tương ứng ngay bên dưới:
-        // 1: Số điện thoại | 2: Tin nhắn (giữ tương thích với Trang chủ) | 3: Website | 4: Gmail
         tabPhone.setOnClickListener(v -> selectLookupTab(1));
         tabEmail.setOnClickListener(v -> selectLookupTab(4));
         tabWebsite.setOnClickListener(v -> selectLookupTab(3));
         tabAccount.setOnClickListener(v -> selectLookupTab(2));
 
-        // Thanh điều hướng dưới cùng (Bottom Navigation)
-        View navLookup = findViewById(R.id.navLookup);
-        if (navLookup != null) {
-            navLookup.setOnClickListener(v -> selectLookupTab(1));
-        }
-
-        View navWarning = findViewById(R.id.navWarning);
-        if (navWarning != null) {
-            navWarning.setOnClickListener(v -> selectLookupTab(3));
-        }
-
-        // Bấm vào nút "Trang chủ" ở thanh dưới cùng để quay về Trang chủ
         View navHome = findViewById(R.id.navHome);
         if (navHome != null) {
             navHome.setOnClickListener(v -> {
@@ -130,9 +108,28 @@ public class GiaoDienTraCuu extends AppCompatActivity {
             });
         }
 
-        // =====================================================================
-        // 1. KHỞI TẠO TAB SỐ ĐIỆN THOẠI (CHỈ CHO NHẬP SỐ)
-        // =====================================================================
+        View navLookup = findViewById(R.id.navLookup);
+        if (navLookup != null) {
+            navLookup.setOnClickListener(v -> selectLookupTab(1));
+        }
+
+        View navBaoCao = findViewById(R.id.navBaoCao);
+        if (navBaoCao != null) {
+            navBaoCao.setOnClickListener(v -> {
+                Intent intent = new Intent(GiaoDienTraCuu.this, BaoCaoActivity.class);
+                startActivity(intent);
+            });
+        }
+
+        View navDienDan = findViewById(R.id.navDienDan);
+        if (navDienDan != null) {
+            navDienDan.setOnClickListener(v -> {
+                Intent intent = new Intent(GiaoDienTraCuu.this, NewsFeedActivity.class);
+                startActivity(intent);
+                finish();
+            });
+        }
+
         tvSearchIcon = findViewById(R.id.tvSearchIcon);
         etLookupInput = findViewById(R.id.etLookupInput);
         btnLookup = findViewById(R.id.btnLookup);
@@ -150,10 +147,8 @@ public class GiaoDienTraCuu extends AppCompatActivity {
         tvDangerReportCount = findViewById(R.id.tvDangerReportCount);
         tvDangerDescription = findViewById(R.id.tvDangerDescription);
 
-        // Cố định chỉ cho phép nhập số
         etLookupInput.setInputType(InputType.TYPE_CLASS_NUMBER);
 
-        // Bấm vào 3 gợi ý "Tra cứu nhanh" SĐT
         findViewById(R.id.chipPhone1).setOnClickListener(v -> {
             etLookupInput.setText("0987654321");
             etLookupInput.setSelection(etLookupInput.getText().length());
@@ -187,7 +182,6 @@ public class GiaoDienTraCuu extends AppCompatActivity {
             public void afterTextChanged(Editable s) {}
         });
 
-        // Gọi API Backend thật cho SĐT
         btnLookup.setOnClickListener(v -> {
             String input = etLookupInput.getText().toString().trim();
             if (input.isEmpty()) {
@@ -233,9 +227,6 @@ public class GiaoDienTraCuu extends AppCompatActivity {
             });
         });
 
-        // =====================================================================
-        // 2. KHỞI TẠO TAB TRA CỨU GMAIL
-        // =====================================================================
         tvEmailSearchIcon = findViewById(R.id.tvEmailSearchIcon);
         etEmailInput = findViewById(R.id.etEmailInput);
         btnLookupEmail = findViewById(R.id.btnLookupEmail);
@@ -252,7 +243,6 @@ public class GiaoDienTraCuu extends AppCompatActivity {
         tvDangerEmailReportCount = findViewById(R.id.tvDangerEmailReportCount);
         tvDangerEmailDescription = findViewById(R.id.tvDangerEmailDescription);
 
-        // Bấm vào 2 gợi ý "Tra cứu nhanh" Gmail
         findViewById(R.id.chipEmail1).setOnClickListener(v -> {
             etEmailInput.setText("hotro.nhanthuong@gmail.com");
             etEmailInput.setSelection(etEmailInput.getText().length());
@@ -282,7 +272,6 @@ public class GiaoDienTraCuu extends AppCompatActivity {
             public void afterTextChanged(Editable s) {}
         });
 
-        // Gọi API Backend thật cho Gmail
         btnLookupEmail.setOnClickListener(v -> {
             String email = etEmailInput.getText().toString().trim();
             if (!email.contains("@")) {
@@ -328,9 +317,6 @@ public class GiaoDienTraCuu extends AppCompatActivity {
             });
         });
 
-        // =====================================================================
-        // 3. KHỞI TẠO TAB QUÉT WEBSITE
-        // =====================================================================
         etUrl = findViewById(R.id.etUrl);
         btnClearUrl = findViewById(R.id.btnClearUrl);
         btnCheckSafety = findViewById(R.id.btnCheckSafety);
@@ -363,7 +349,6 @@ public class GiaoDienTraCuu extends AppCompatActivity {
 
         btnClearUrl.setOnClickListener(v -> etUrl.setText(""));
 
-        // Gọi API Backend thật cho Website
         btnCheckSafety.setOnClickListener(v -> {
             String rawInput = etUrl.getText().toString().trim();
             if (rawInput.isEmpty()) {
@@ -402,9 +387,6 @@ public class GiaoDienTraCuu extends AppCompatActivity {
             });
         });
 
-        // =====================================================================
-        // 4. KHỞI TẠO TAB PHÂN TÍCH TIN NHẮN (VĂN BẢN)
-        // =====================================================================
         etTextContent = findViewById(R.id.etTextContent);
         tvCharCount = findViewById(R.id.tvCharCount);
         tvQuickPaste = findViewById(R.id.tvQuickPaste);
@@ -470,7 +452,6 @@ public class GiaoDienTraCuu extends AppCompatActivity {
             cardTextResult.setVisibility(View.GONE);
         });
 
-        // Gọi API Backend thật cho Tin nhắn / Nội dung
         btnAnalyzeText.setOnClickListener(v -> {
             String content = etTextContent.getText().toString().trim();
             if (content.isEmpty()) {
@@ -494,24 +475,23 @@ public class GiaoDienTraCuu extends AppCompatActivity {
                     btnAnalyzeText.setEnabled(true);
                     btnAnalyzeText.setText("🛡️  Phân tích mức độ an toàn");
                     Toast.makeText(GiaoDienTraCuu.this, errorMsg, Toast.LENGTH_SHORT).show();
-                    // Nếu lỗi kết nối server, phân tích cục bộ tạm thời
                     analyzeTextContent(content);
                 }
             });
         });
 
-        // Kiểm tra xem có nhận tab đầu tiên từ Trang chủ chuyển sang không
         int initialTab = getIntent().getIntExtra("TAB_INDEX", 1);
         selectLookupTab(initialTab);
+        View navProfile = findViewById(R.id.navProfile);
+        if (navProfile != null) {
+            navProfile.setOnClickListener(v -> {
+                Intent intent = new Intent(this, ProfileActivity.class);
+                startActivity(intent);
+            });
+        }
     }
 
-    // =========================================================================
-    // HÀM CHUYỂN ĐỔI 4 TAB HIỂN THỊ NGAY BÊN DƯỚI
-    // tabIndex: 1 = SĐT | 4 = Gmail | 3 = Website | 2 = Tin nhắn
-    // =========================================================================
-
     private void selectLookupTab(int tabIndex) {
-        // Đổi màu viền và nền cho Tab đang được chọn
         tabPhone.setCardBackgroundColor(Color.parseColor(tabIndex == 1 ? "#FEF3F2" : "#FFFFFF"));
         tabPhone.setStrokeColor(Color.parseColor(tabIndex == 1 ? "#D92D20" : "#EAECF0"));
         tvTabPhone.setTextColor(Color.parseColor(tabIndex == 1 ? "#D92D20" : "#475467"));
@@ -528,13 +508,11 @@ public class GiaoDienTraCuu extends AppCompatActivity {
         tabAccount.setStrokeColor(Color.parseColor(tabIndex == 2 ? "#D92D20" : "#EAECF0"));
         tvTabAccount.setTextColor(Color.parseColor(tabIndex == 2 ? "#D92D20" : "#475467"));
 
-        // Ẩn/Hiện nội dung tương ứng ngay bên dưới 4 nút Tab
         layoutScreenTraCuu.setVisibility(tabIndex == 1 ? View.VISIBLE : View.GONE);
         layoutScreenEmail.setVisibility(tabIndex == 4 ? View.VISIBLE : View.GONE);
         layoutScreenWeb.setVisibility(tabIndex == 3 ? View.VISIBLE : View.GONE);
         layoutScreenText.setVisibility(tabIndex == 2 ? View.VISIBLE : View.GONE);
 
-        // Cập nhật dòng tiêu đề trên thanh màu đỏ theo từng Tab
         if (tabIndex == 1 || tabIndex == 4) {
             tvHeaderTitle.setText("Tra cứu lừa đảo");
             tvHeaderSubtitle.setText("Kiểm tra thông tin trước khi giao dịch");
@@ -546,10 +524,6 @@ public class GiaoDienTraCuu extends AppCompatActivity {
             tvHeaderSubtitle.setText("Phát hiện đường dẫn giả mạo trước khi truy cập");
         }
     }
-
-    // =========================================================================
-    // HÀM HỖ TRỢ GỌI API RETROFIT
-    // =========================================================================
 
     private void executeApiScan(String type, String value, ScanApiCallback callback) {
         ScanRequest request = new ScanRequest(type, value);
@@ -643,15 +617,10 @@ public class GiaoDienTraCuu extends AppCompatActivity {
         if (signs.size() >= 3) tvSign3.setText(signs.get(2));
     }
 
-    // Các hàm mở trực tiếp
     public void openLookupScreen() { selectLookupTab(1); }
     public void openEmailLookupScreen() { selectLookupTab(4); }
     public void openTextAnalyzerScreen() { selectLookupTab(2); }
     public void openWebScannerScreen() { selectLookupTab(3); }
-
-    // =========================================================================
-    // HÀM XỬ LÝ PHÂN TÍCH VĂN BẢN CỤC BỘ (KHI KHÔNG CÓ MẠNG)
-    // =========================================================================
 
     private void analyzeTextContent(String text) {
         String lower = text.toLowerCase();
@@ -730,11 +699,6 @@ public class GiaoDienTraCuu extends AppCompatActivity {
         if (signs.size() >= 3) tvSign3.setText(signs.get(2));
     }
 
-    // =========================================================================
-    // CÁC HÀM THAY ĐỔI GIAO DIỆN (SĐT, GMAIL, WEB)
-    // =========================================================================
-
-    // --- Tab 1: Số điện thoại ---
     public void showLookupInitialState() {
         btnLookup.setText("Tra cứu");
         tvSearchIcon.setVisibility(View.VISIBLE);
@@ -770,7 +734,6 @@ public class GiaoDienTraCuu extends AppCompatActivity {
         cardResultDanger.setVisibility(View.VISIBLE);
     }
 
-    // --- Tab 2: Gmail ---
     public void showEmailLookupInitialState() {
         btnLookupEmail.setText("Tra cứu");
         tvEmailSearchIcon.setVisibility(View.VISIBLE);
@@ -806,7 +769,6 @@ public class GiaoDienTraCuu extends AppCompatActivity {
         cardEmailResultDanger.setVisibility(View.VISIBLE);
     }
 
-    // --- Tab 3: Website ---
     public void showWebDefaultState() {
         cardStateDefault.setVisibility(View.VISIBLE);
         cardStateSafe.setVisibility(View.GONE);

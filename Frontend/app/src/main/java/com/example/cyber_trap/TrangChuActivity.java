@@ -31,58 +31,54 @@ public class TrangChuActivity extends AppCompatActivity {
 
         ScrollView scrollView = findViewById(R.id.scrollView);
 
-        // 1. Ánh xạ các thẻ tính năng
         ConstraintLayout card1 = findViewById(R.id.card1);
         ConstraintLayout card2 = findViewById(R.id.card2);
         ConstraintLayout card3 = findViewById(R.id.card3);
         ConstraintLayout cardGoiKhanCap = findViewById(R.id.cardGoiKhanCap);
 
-        // 2. Ánh xạ thanh điều hướng bên dưới
         LinearLayout navHome = findViewById(R.id.navHome);
         LinearLayout navSearch = findViewById(R.id.navSearch);
         LinearLayout navBaoCao = findViewById(R.id.navBaoCao);
-        LinearLayout navWarningNav = findViewById(R.id.navWarningNav);
+        LinearLayout navDienDan = findViewById(R.id.navDienDan);
 
         if (navHome != null && scrollView != null) {
             navHome.setOnClickListener(v -> scrollView.smoothScrollTo(0, 0));
         }
 
-        // Sự kiện mở trang Tra cứu lừa đảo theo Tab
         if (card1 != null) {
             card1.setOnClickListener(v -> openMainActivityWithTab(1));
         }
-        if (card2 != null) {
-            card2.setOnClickListener(v -> openMainActivityWithTab(3));
-        }
+
         if (navSearch != null) {
             navSearch.setOnClickListener(v -> openMainActivityWithTab(1));
         }
 
-        // ==========================================
-        // Chuyển sang màn hình Gửi Báo Cáo
-        // ==========================================
+        View.OnClickListener openDienDanListener = v -> {
+            Intent intent = new Intent(TrangChuActivity.this, NewsFeedActivity.class);
+            startActivity(intent);
+        };
+
+        if (card2 != null) {
+            card2.setOnClickListener(openDienDanListener);
+        }
+
+        if (navDienDan != null) {
+            navDienDan.setOnClickListener(openDienDanListener);
+        }
+
+        View.OnClickListener openBaoCaoListener = v -> {
+            Intent intent = new Intent(TrangChuActivity.this, BaoCaoActivity.class);
+            startActivity(intent);
+        };
+
         if (card3 != null) {
-            card3.setOnClickListener(v -> {
-                Intent intent = new Intent(TrangChuActivity.this, BaoCaoActivity.class);
-                startActivity(intent);
-            });
+            card3.setOnClickListener(openBaoCaoListener);
         }
 
         if (navBaoCao != null) {
-            navBaoCao.setOnClickListener(v -> {
-                Intent intent = new Intent(TrangChuActivity.this, BaoCaoActivity.class);
-                startActivity(intent);
-            });
+            navBaoCao.setOnClickListener(openBaoCaoListener);
         }
 
-        // ==========================================
-        // Sự kiện Cảnh báo (Mở tab Cảnh báo mới)
-        // ==========================================
-        if (navWarningNav != null) {
-            navWarningNav.setOnClickListener(v -> openMainActivityWithTab(3));
-        }
-
-        // Sự kiện gọi điện khẩn cấp
         View.OnClickListener callListener = v -> {
             Intent callIntent = new Intent(Intent.ACTION_DIAL);
             callIntent.setData(Uri.parse("tel:0692345860"));
@@ -91,6 +87,13 @@ public class TrangChuActivity extends AppCompatActivity {
 
         if (cardGoiKhanCap != null) {
             cardGoiKhanCap.setOnClickListener(callListener);
+        }
+        View navProfile = findViewById(R.id.navProfile);
+        if (navProfile != null) {
+            navProfile.setOnClickListener(v -> {
+                Intent intent = new Intent(this, ProfileActivity.class);
+                startActivity(intent);
+            });
         }
     }
 

@@ -16,11 +16,17 @@ const scanRoutes = require("./scan.routes");
 const authRoutes = require("./auth.routes");
 const reportRoutes = require("./report.route");
 const adminReportRoutes = require("./admin.report.route");
+const forumInteractionRoutes = require("./forum.interaction.route");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use("/uploads", express.static(path.join(__dirname, "uploads"), {
+    setHeaders(response) {
+        response.setHeader("X-Content-Type-Options", "nosniff");
+    }
+}));
 
 // Routes hỗ trợ cả tiền tố /api/v1 và /api (tránh lệch route giữa Frontend và Backend)
 app.use("/api/v1/auth", authRoutes);
@@ -34,6 +40,8 @@ app.use("/api/reports", reportRoutes);
 
 app.use("/api/v1/admin", adminReportRoutes);
 app.use("/api/admin", adminReportRoutes);
+
+app.use("/api/v1/posts", forumInteractionRoutes);
 
 app.get(["/api/health", "/api/v1/health"], (req, res) => {
     res.json({

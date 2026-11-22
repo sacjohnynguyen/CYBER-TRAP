@@ -2,6 +2,7 @@ package com.example.cyber_trap;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -26,26 +27,25 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.SharedPreferences;
 import com.google.android.material.button.MaterialButton;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.mlkit.vision.common.InputImage;
-
-import java.lang.reflect.Type;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class BaoCaoActivity extends AppCompatActivity {
 
@@ -127,7 +127,6 @@ public class BaoCaoActivity extends AppCompatActivity {
                 Toast.makeText(this, "Chỉ được chọn tối đa 4 ảnh!", Toast.LENGTH_SHORT).show();
                 return;
             }
-            // ĐÃ SỬA: Thay đổi cách gọi Intent để chọn ảnh ổn định hơn trên máy ảo
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
             intent.setType("image/*");
             imagePickerLauncher.launch(intent);
@@ -149,7 +148,6 @@ public class BaoCaoActivity extends AppCompatActivity {
             newReportDesc = desc.isEmpty() ? "Không có mô tả thêm." : desc;
             newReportDate = currentDate;
 
-            // Lấy token & userId từ SharedPreferences
             SharedPreferences prefs = getSharedPreferences("CyberTrapPrefs", MODE_PRIVATE);
             String token = prefs.getString("ACCESS_TOKEN", null);
             String loggedUser = prefs.getString("LOGGED_USER", "default");
@@ -166,10 +164,8 @@ public class BaoCaoActivity extends AppCompatActivity {
             String finalDesc = desc.isEmpty() ? "Không có mô tả thêm." : desc;
             ReportRequest request = new ReportRequest(target, targetType, type, finalDesc, 0);
 
-            // Lưu bộ nhớ đệm Local SharedPreferences làm dự phòng
             saveReportToLocalCache(prefs, loggedUser, new ReportItem(0, target, targetType, type, finalDesc, "PENDING", currentDate));
 
-            // Gọi API Backend nếu có Token
             if (token != null && !token.trim().isEmpty()) {
                 btnGuiBaoCao.setEnabled(false);
                 RetrofitClient.getApiService().createReport("Bearer " + token, request).enqueue(new Callback<ReportPostResponse>() {
@@ -228,11 +224,19 @@ public class BaoCaoActivity extends AppCompatActivity {
                 startActivity(intent);
             });
         }
+
+        LinearLayout navProfileBtn = findViewById(R.id.navProfileBtn);
+        if (navProfileBtn != null) {
+            navProfileBtn.setOnClickListener(v -> {
+                Intent intent = new Intent(BaoCaoActivity.this, ProfileActivity.class);
+                startActivity(intent);
+                finish();
+            });
+        }
     }
 
     private ImageView createImageViewForGallery() {
         ImageView imageView = new ImageView(this);
-        // Đã sửa lỗi thiếu dấu nhân (*) ở đây
         int size = (int) (80 * getResources().getDisplayMetrics().density);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(size, size);
         params.setMargins(0, 0, 16, 0);
@@ -273,7 +277,6 @@ public class BaoCaoActivity extends AppCompatActivity {
                             for (Text.Element element : line.getElements()) {
                                 String text = element.getText();
 
-                                // Sử dụng biểu thức Regex mạnh tay nhất để che mọi chữ số
                                 if (text.matches(".*\\d+.*")) {
                                     Rect boundingBox = element.getBoundingBox();
                                     if (boundingBox != null) {

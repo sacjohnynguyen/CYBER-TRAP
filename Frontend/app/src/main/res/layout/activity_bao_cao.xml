@@ -8,7 +8,7 @@
     tools:context=".BaoCaoActivity"
     tools:ignore="HardcodedText,ContentDescription,SpUsage,Autofill,LabelFor,TouchTargetSizeCheck,VisualLintTextFieldSize">
 
-    <!-- Header Gửi Báo Cáo -->
+    
     <LinearLayout
         android:id="@+id/headerBaoCao"
         android:layout_width="match_parent"
@@ -35,7 +35,7 @@
             android:textSize="14sp" />
     </LinearLayout>
 
-    <!-- FORM NHẬP LIỆU (ID layoutForm BẮT BUỘC PHẢI CÓ Ở ĐÂY) -->
+    
     <ScrollView
         android:id="@+id/layoutForm"
         android:layout_width="0dp"
@@ -321,7 +321,7 @@
         </LinearLayout>
     </ScrollView>
 
-    <!-- GIAO DIỆN BÁO CÁO THÀNH CÔNG (Căn giữa màn hình, mặc định ẩn) -->
+    
     <LinearLayout
         android:id="@+id/layoutSuccess"
         android:layout_width="0dp"
@@ -382,7 +382,7 @@
             app:strokeWidth="1dp" />
     </LinearLayout>
 
-    <!-- Bottom Navigation Bar -->
+    
     <LinearLayout
         android:id="@+id/bottomNavBaoCao"
         android:layout_width="0dp"

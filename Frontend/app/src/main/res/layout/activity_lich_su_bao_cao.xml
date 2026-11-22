@@ -8,7 +8,6 @@
     tools:context=".LichSuBaoCaoActivity"
     tools:ignore="HardcodedText,ContentDescription,SpUsage,Autofill,LabelFor,TouchTargetSizeCheck,VisualLintTextFieldSize,RtlSymmetry">
 
-    <!-- Header -->
     <LinearLayout
         android:id="@+id/headerLichSu"
         android:layout_width="match_parent"
@@ -76,7 +75,6 @@
             android:textSize="13sp" />
     </RelativeLayout>
 
-    <!-- Danh sách Báo cáo -->
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -95,14 +93,13 @@
             android:paddingHorizontal="16dp"
             android:paddingBottom="24dp">
 
-            <!-- KHU VỰC TRỐNG -->
             <LinearLayout
                 android:id="@+id/layoutEmptyState"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center"
                 android:layout_marginTop="50dp"
+                android:gravity="center"
+                android:orientation="vertical"
                 android:visibility="visible">
 
                 <TextView
@@ -129,7 +126,6 @@
                     android:textSize="14sp" />
             </LinearLayout>
 
-            <!-- ITEM BÁO CÁO -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardBaoCaoItem1"
                 android:layout_width="match_parent"
@@ -151,6 +147,7 @@
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -183,17 +180,20 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp">
+
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
                             android:orientation="vertical">
+
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Ngày gửi"
                                 android:textColor="#9E9E9E"
                                 android:textSize="11sp" />
+
                             <TextView
                                 android:id="@+id/tvReportItemDate"
                                 android:layout_width="wrap_content"
@@ -219,7 +219,6 @@
         </LinearLayout>
     </ScrollView>
 
-    <!-- Bottom Navigation Bar -->
     <LinearLayout
         android:id="@+id/bottomNavLichSu"
         android:layout_width="0dp"
@@ -238,6 +237,8 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center"
             android:orientation="vertical">
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🏠" android:textSize="20sp" />
@@ -249,6 +250,8 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center"
             android:orientation="vertical">
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📢" android:textSize="20sp" />
@@ -266,9 +269,12 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/navProfile"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center"
             android:orientation="vertical">
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="👤" android:textSize="20sp" />

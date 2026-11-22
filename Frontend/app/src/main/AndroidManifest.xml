@@ -15,7 +15,6 @@
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.Cyber_Trap">
 
-        <!-- Đã trả màn hình Đăng nhập về làm màn hình khởi động chuẩn -->
         <activity
             android:name=".LoginActivity"
             android:exported="true"
@@ -31,7 +30,6 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
-        <!-- Màn hình Trang Chủ (Đã tắt intent-filter) -->
         <activity
             android:name=".TrangChuActivity"
             android:exported="false"
@@ -42,7 +40,6 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
-        <!-- === CÁC MÀN HÌNH MỚI COPY TỪ PROJECT TEST SANG === -->
         <activity
             android:name=".BaoCaoActivity"
             android:exported="false"
@@ -55,6 +52,26 @@
 
         <activity
             android:name=".ChiTietBaoCaoActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".NewsFeedActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".CreatePostActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".PostDetailActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".ProfileActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
