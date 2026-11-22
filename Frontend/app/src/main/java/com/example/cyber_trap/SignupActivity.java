@@ -78,6 +78,11 @@ public class SignupActivity extends AppCompatActivity {
                             String msg = regResponse.getMessage() != null ? regResponse.getMessage() : "Đăng ký thành công!";
                             Toast.makeText(SignupActivity.this, msg, Toast.LENGTH_SHORT).show();
 
+                            // Tăng số lượng Người dùng thống kê (+1)
+                            android.content.SharedPreferences stats = getSharedPreferences("CyberTrapStats", MODE_PRIVATE);
+                            int usersCount = stats.getInt("STAT_USERS", 0);
+                            stats.edit().putInt("STAT_USERS", usersCount + 1).apply();
+
                             // Đăng ký thành công -> Quay lại Đăng nhập
                             Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
                             startActivity(intent);

@@ -80,6 +80,23 @@ public class LoginActivity extends AppCompatActivity {
                         }
                         editor.apply();
 
+                        // Lưu UserProfile cho ProfileActivity & Avatar
+                        SharedPreferences userProfile = getSharedPreferences("UserProfile", Context.MODE_PRIVATE);
+                        String emailVal = (loginResponse.getUser() != null && loginResponse.getUser().getEmail() != null)
+                                ? loginResponse.getUser().getEmail()
+                                : (username.contains("@") ? username : username + "@gmail.com");
+                        userProfile.edit()
+                                .putString("user_name", username)
+                                .putString("user_email", emailVal)
+                                .apply();
+
+                        // Đảm bảo số lượng Người dùng thống kê tối thiểu là 1 khi đăng nhập
+                        SharedPreferences stats = getSharedPreferences("CyberTrapStats", Context.MODE_PRIVATE);
+                        int currentUsers = stats.getInt("STAT_USERS", 0);
+                        if (currentUsers < 1) {
+                            stats.edit().putInt("STAT_USERS", 1).apply();
+                        }
+
                         String msg = loginResponse.getMessage() != null ? loginResponse.getMessage() : "Đăng nhập thành công!";
                         Toast.makeText(LoginActivity.this, msg, Toast.LENGTH_SHORT).show();
 
