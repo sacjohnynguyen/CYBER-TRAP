@@ -64,6 +64,19 @@ public class CreatePostActivity extends AppCompatActivity {
         tagOtp = findViewById(R.id.tagOtp);
         tagOther = findViewById(R.id.tagOther);
 
+        TextView tvCreateAuthorName = findViewById(R.id.tvCreateAuthorName);
+        TextView tvCreateAvatarInitials = findViewById(R.id.tvCreateAvatarInitials);
+
+        String loggedUser = UserUtils.getLoggedUsername(this);
+        String initials = UserUtils.getInitials(loggedUser);
+
+        if (tvCreateAuthorName != null) {
+            tvCreateAuthorName.setText(loggedUser);
+        }
+        if (tvCreateAvatarInitials != null) {
+            tvCreateAvatarInitials.setText(initials);
+        }
+
         findViewById(R.id.btnBackCreate).setOnClickListener(v -> finish());
 
         if (tvPrivacy != null) {
