@@ -167,16 +167,13 @@ public class CreatePostActivity extends AppCompatActivity {
         }
 
         btnSubmitPost.setOnClickListener(v -> {
-            String title = etPostTitle.getText().toString().trim();
             String content = etPostContent.getText().toString().trim();
 
             if (content.isEmpty()) {
                 Toast.makeText(this, "Vui lòng mô tả chi tiết hình thức lừa đảo!", Toast.LENGTH_SHORT).show();
                 return;
             }
-            if (title.isEmpty()) {
-                title = content.length() > 45 ? content.substring(0, 45) + "..." : content;
-            }
+            String title = content.length() > 50 ? content.substring(0, 50) + "..." : content;
 
             String finalHashtag = selectedHashtag;
             if ("OTHER".equals(selectedHashtag)) {
@@ -190,8 +187,8 @@ public class CreatePostActivity extends AppCompatActivity {
             }
 
             boolean isAnonymous = "Ẩn danh".equals(selectedPrivacy);
-            String authorName = isAnonymous ? "Người dùng ẩn danh" : "Bảo Ngọc";
-            String authorInitials = isAnonymous ? "ẨD" : "BN";
+            String authorName = isAnonymous ? "Người dùng ẩn danh" : UserUtils.getLoggedUsername(this);
+            String authorInitials = isAnonymous ? "ẨD" : UserUtils.getInitials(authorName);
 
             if (editPosition >= 0 && editPosition < NewsFeedActivity.allPosts.size()) {
                 Post existing = NewsFeedActivity.allPosts.get(editPosition);
@@ -202,6 +199,7 @@ public class CreatePostActivity extends AppCompatActivity {
                 existing.authorName = authorName;
                 existing.authorInitials = authorInitials;
                 existing.imageUris = new ArrayList<>(selectedImageUris);
+                ForumCacheManager.savePosts(this, NewsFeedActivity.allPosts);
                 Toast.makeText(this, "Đã cập nhật bài viết!", Toast.LENGTH_SHORT).show();
             } else {
                 Post newPost = new Post(
@@ -217,6 +215,7 @@ public class CreatePostActivity extends AppCompatActivity {
                 );
                 newPost.privacy = selectedPrivacy;
                 NewsFeedActivity.allPosts.add(0, newPost);
+                ForumCacheManager.savePosts(this, NewsFeedActivity.allPosts);
                 Toast.makeText(this, "Đăng cảnh báo thành công!", Toast.LENGTH_SHORT).show();
             }
             finish();

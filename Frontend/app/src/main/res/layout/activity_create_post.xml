@@ -150,7 +150,8 @@
                 android:textColor="#111111"
                 android:textColorHint="#9E9E9E"
                 android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:visibility="gone" />
 
             <EditText
                 android:id="@+id/etPostContent"

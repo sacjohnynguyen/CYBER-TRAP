@@ -109,13 +109,16 @@ public class PostDetailActivity extends AppCompatActivity {
                 return;
             }
 
+            String loggedUser = UserUtils.getLoggedUsername(this);
+            String loggedInitials = UserUtils.getInitials(loggedUser);
+
             if (replyingTarget != null) {
                 String parentId = replyingTarget.isReply ? replyingTarget.parentId : replyingTarget.id;
                 Comment reply = new Comment(
                         UUID.randomUUID().toString(),
                         parentId,
-                        "Bảo Ngọc",
-                        "BN",
+                        loggedUser,
+                        loggedInitials,
                         "Vừa xong",
                         "@" + replyingTarget.authorName + " " + text,
                         true
@@ -127,8 +130,8 @@ public class PostDetailActivity extends AppCompatActivity {
                 Comment newComment = new Comment(
                         UUID.randomUUID().toString(),
                         null,
-                        "Bảo Ngọc",
-                        "BN",
+                        loggedUser,
+                        loggedInitials,
                         "Vừa xong",
                         text,
                         false
@@ -137,6 +140,20 @@ public class PostDetailActivity extends AppCompatActivity {
             }
 
             currentPost.commentCount = currentPost.comments.size();
+
+            // Thêm thông báo tương tác mới khi có bình luận
+            NotificationItem notif = new NotificationItem(
+                    UUID.randomUUID().toString(),
+                    loggedUser,
+                    loggedInitials,
+                    "COMMENT",
+                    currentPost.title,
+                    postPosition,
+                    "Vừa xong",
+                    false
+            );
+            NotificationManager.addNotification(this, notif);
+
             etCommentInput.setText("");
             commentAdapter.notifyDataSetChanged();
             updateCommentHeader();

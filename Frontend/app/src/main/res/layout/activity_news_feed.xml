@@ -55,20 +55,41 @@
             android:clickable="true"
             android:focusable="true"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/btnNotify"
+            app:layout_constraintEnd_toStartOf="@id/btnNotifyContainer"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/btnNotify"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
+        <FrameLayout
+            android:id="@+id/btnNotifyContainer"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
             android:layout_marginEnd="8dp"
-            android:gravity="center"
-            android:text="🔔"
-            android:textSize="18sp"
+            android:clickable="true"
+            android:focusable="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/cardHeaderAvatar"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/btnNotify"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="🔔"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/tvNotifyBadge"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="top|end"
+                android:background="@drawable/bg_circle_red"
+                android:gravity="center"
+                android:text="1"
+                android:textColor="#FFFFFF"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+        </FrameLayout>
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardHeaderAvatar"
@@ -84,6 +105,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
+                android:id="@+id/tvHeaderAvatarText"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
@@ -163,12 +185,26 @@
                     android:id="@+id/chipJob"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
                     android:background="#F0F2F5"
                     android:paddingStart="12dp"
                     android:paddingTop="6dp"
                     android:paddingEnd="12dp"
                     android:paddingBottom="6dp"
                     android:text="#ViecNheLuongCao"
+                    android:textColor="#555555"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/chipSaved"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="#F0F2F5"
+                    android:paddingStart="12dp"
+                    android:paddingTop="6dp"
+                    android:paddingEnd="12dp"
+                    android:paddingBottom="6dp"
+                    android:text="🔖 Bài viết đã lưu"
                     android:textColor="#555555"
                     android:textSize="12sp" />
             </LinearLayout>
@@ -206,6 +242,7 @@
                 app:cardElevation="0dp">
 
                 <TextView
+                    android:id="@+id/tvCreatePostAvatarText"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center"

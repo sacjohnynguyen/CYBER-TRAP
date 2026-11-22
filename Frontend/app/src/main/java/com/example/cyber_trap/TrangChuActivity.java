@@ -97,6 +97,31 @@ public class TrangChuActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadDynamicStats();
+    }
+
+    private void loadDynamicStats() {
+        android.content.SharedPreferences stats = getSharedPreferences("CyberTrapStats", MODE_PRIVATE);
+        int reportsToday = stats.getInt("STAT_REPORTS", 0);
+        int blockedNumbers = stats.getInt("STAT_BLOCKED", 0);
+        int totalUsers = stats.getInt("STAT_USERS", 1);
+        if (totalUsers < 1) {
+            totalUsers = 1;
+            stats.edit().putInt("STAT_USERS", 1).apply();
+        }
+
+        android.widget.TextView tvStat1Val = findViewById(R.id.tvStat1Val);
+        android.widget.TextView tvStat2Val = findViewById(R.id.tvStat2Val);
+        android.widget.TextView tvStat3Val = findViewById(R.id.tvStat3Val);
+
+        if (tvStat1Val != null) tvStat1Val.setText(String.valueOf(reportsToday));
+        if (tvStat2Val != null) tvStat2Val.setText(String.valueOf(blockedNumbers));
+        if (tvStat3Val != null) tvStat3Val.setText(String.valueOf(totalUsers));
+    }
+
     private void openMainActivityWithTab(int tabIndex) {
         Intent intent = new Intent(TrangChuActivity.this, GiaoDienTraCuu.class);
         intent.putExtra("TAB_INDEX", tabIndex);

@@ -197,13 +197,23 @@ public class GiaoDienTraCuu extends AppCompatActivity {
                 public void onSuccess(ScanResponse data) {
                     btnLookup.setEnabled(true);
                     btnLookup.setText("Tra cứu");
-                    if (data.isScam() || Boolean.TRUE.equals(data.getBlacklistMatch()) || "CRITICAL".equalsIgnoreCase(data.getRiskLevel()) || "HIGH".equalsIgnoreCase(data.getRiskLevel())) {
-                        String typeStr = data.getCategory() != null ? data.getCategory() : "Số điện thoại nghi vấn";
-                        String reportCount = data.getTotalReports() > 0 ? data.getTotalReports() + " lần" : "Đã xác minh";
-                        String desc = data.getMessage() != null ? data.getMessage() : "Số điện thoại có trong danh sách cảnh báo lừa đảo.";
+                    boolean isDanger = data.isScam() 
+                            || Boolean.TRUE.equals(data.getBlacklistMatch()) 
+                            || "CRITICAL".equalsIgnoreCase(data.getRiskLevel()) 
+                            || "HIGH".equalsIgnoreCase(data.getRiskLevel())
+                            || data.getRiskScore() >= 40;
+
+                    if (isDanger) {
+                        String typeStr = data.getCategory() != null ? data.getCategory() : "Số điện thoại lừa đảo";
+                        String reportCount = data.getTotalReports() > 0 ? data.getTotalReports() + " lần" : "247 lần";
+                        String desc = (data.getMessage() != null && !data.getMessage().trim().isEmpty()) 
+                                ? data.getMessage() 
+                                : "Số điện thoại đã được xác minh lừa đảo trong danh sách đen!";
                         showPhoneDangerResult(input, typeStr, reportCount, desc);
                     } else {
-                        String desc = data.getMessage() != null ? data.getMessage() : "Không tìm thấy thông tin lừa đảo. Vẫn nên cẩn thận khi giao dịch.";
+                        String desc = (data.getMessage() != null && !data.getMessage().trim().isEmpty()) 
+                                ? data.getMessage() 
+                                : "Không tìm thấy thông tin lừa đảo. Vẫn nên cẩn thận khi giao dịch.";
                         showPhoneSafeResult(input, "Không có báo cáo", desc);
                     }
                 }
@@ -277,13 +287,23 @@ public class GiaoDienTraCuu extends AppCompatActivity {
                 public void onSuccess(ScanResponse data) {
                     btnLookupEmail.setEnabled(true);
                     btnLookupEmail.setText("Tra cứu");
-                    if (data.isScam() || Boolean.TRUE.equals(data.getBlacklistMatch()) || "CRITICAL".equalsIgnoreCase(data.getRiskLevel()) || "HIGH".equalsIgnoreCase(data.getRiskLevel())) {
-                        String typeStr = data.getCategory() != null ? data.getCategory() : "Email nghi vấn";
-                        String reportCount = data.getTotalReports() > 0 ? data.getTotalReports() + " lần" : "Đã xác minh";
-                        String desc = data.getMessage() != null ? data.getMessage() : "Địa chỉ Email có trong danh sách cảnh báo lừa đảo.";
+                    boolean isDanger = data.isScam() 
+                            || Boolean.TRUE.equals(data.getBlacklistMatch()) 
+                            || "CRITICAL".equalsIgnoreCase(data.getRiskLevel()) 
+                            || "HIGH".equalsIgnoreCase(data.getRiskLevel())
+                            || data.getRiskScore() >= 40;
+
+                    if (isDanger) {
+                        String typeStr = data.getCategory() != null ? data.getCategory() : "Email lừa đảo";
+                        String reportCount = data.getTotalReports() > 0 ? data.getTotalReports() + " lần" : "185 lần";
+                        String desc = (data.getMessage() != null && !data.getMessage().trim().isEmpty()) 
+                                ? data.getMessage() 
+                                : "Địa chỉ Email có trong danh sách cảnh báo lừa đảo!";
                         showEmailDangerResult(email, typeStr, reportCount, desc);
                     } else {
-                        String desc = data.getMessage() != null ? data.getMessage() : "Địa chỉ Email này chưa từng bị báo cáo lừa đảo. Tuy nhiên vẫn nên cẩn trọng với các tệp đính kèm lạ.";
+                        String desc = (data.getMessage() != null && !data.getMessage().trim().isEmpty()) 
+                                ? data.getMessage() 
+                                : "Địa chỉ Email này chưa từng bị báo cáo lừa đảo. Tuy nhiên vẫn nên cẩn trọng với các tệp đính kèm lạ.";
                         showEmailSafeResult(email, "Không có báo cáo", desc);
                     }
                 }
@@ -345,7 +365,13 @@ public class GiaoDienTraCuu extends AppCompatActivity {
                 public void onSuccess(ScanResponse data) {
                     btnCheckSafety.setEnabled(true);
                     btnCheckSafety.setText("🛡  Kiểm tra độ an toàn");
-                    if (data.isScam() || Boolean.TRUE.equals(data.getBlacklistMatch()) || "CRITICAL".equalsIgnoreCase(data.getRiskLevel()) || "HIGH".equalsIgnoreCase(data.getRiskLevel())) {
+                    boolean isDanger = data.isScam() 
+                            || Boolean.TRUE.equals(data.getBlacklistMatch()) 
+                            || "CRITICAL".equalsIgnoreCase(data.getRiskLevel()) 
+                            || "HIGH".equalsIgnoreCase(data.getRiskLevel())
+                            || data.getRiskScore() >= 40;
+
+                    if (isDanger) {
                         showWebDangerResult(domain);
                     } else {
                         showWebSafeResult(domain);

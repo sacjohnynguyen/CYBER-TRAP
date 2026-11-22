@@ -6,11 +6,14 @@ function scanContent(inputText) {
         return {
             valid: false,
             normalizedContent: "",
+            risk_score: 0,
             riskLevel: "UNKNOWN",
+            is_scam: false,
             isSuspicious: false,
-            isScam: false,
             reasons: ["Nội dung văn bản không được để trống"],
-            matchedKeywords: []
+            detection_reasons: ["Nội dung văn bản không được để trống"],
+            matchedKeywords: [],
+            recommendation: "Không làm theo hướng dẫn hoặc cung cấp OTP/mật khẩu trong tin nhắn lạ."
         };
     }
 
@@ -18,64 +21,73 @@ function scanContent(inputText) {
     const matchedKeywords = [];
     const reasons = [];
 
-    // Danh sách từ khóa lừa đảo phổ biến và trọng số nguy hiểm
+    // Danh sách từ khóa lừa đảo phổ biến (cả tiếng Việt có dấu và không dấu)
     const scamRules = [
-        { keyword: "cung cap otp", weight: 5, reason: "Yêu cầu cung cấp mã OTP" },
-        { keyword: "ma otp", weight: 4, reason: "Đề cập đến mã xác thực OTP" },
-        { keyword: "mat khau", weight: 3, reason: "Yêu cầu hoặc nhắc đến mật khẩu" },
-        { keyword: "khoa tai khoan", weight: 4, reason: "Đe dọa khóa tài khoản ngân hàng / mạng xã hội" },
-        { keyword: "bi khoa", weight: 3, reason: "Thông báo tài khoản bị tạm khóa" },
-        { keyword: "cong an", weight: 4, reason: "Mạo danh cơ quan Công an" },
-        { keyword: "vien kiem sat", weight: 5, reason: "Mạo danh Viện kiểm sát" },
-        { keyword: "toa an", weight: 4, reason: "Đe dọa liên quan đến Tòa án" },
-        { keyword: "lenh bat", weight: 5, reason: "Đe dọa lệnh bắt giam / điều tra" },
-        { keyword: "trung thuong", weight: 3, reason: "Dấu hiệu dụ dỗ trúng thưởng giá trị cao" },
-        { keyword: "nhan thuong", weight: 3, reason: "Dấu hiệu nhận thưởng miễn phí" },
-        { keyword: "qua tri an", weight: 3, reason: "Tặng quà tri ân lừa tiền cước" },
-        { keyword: "chuyen tien gap", weight: 4, reason: "Thúc ép chuyển tiền gấp" },
-        { keyword: "nap tien", weight: 2, reason: "Yêu cầu nạp tiền" },
-        { keyword: "click vao link", weight: 3, reason: "Dẫn dụ bấm vào đường link lạ" },
-        { keyword: "nhap vao lien ket", weight: 3, reason: "Yêu cầu nhấp vào liên kết ngoài" },
-        { keyword: "xac thuc ngay", weight: 3, reason: "Tạo cảm giác cấp bách để nạn nhân mất cảnh giác" },
-        { keyword: "viec nhe luong cao", weight: 4, reason: "Lừa đảo tuyển dụng việc nhẹ lương cao" }
+        { keywords: ["otp", "ma otp", "mã otp", "ma xac thuc", "mã xác thực"], weight: 30, reason: "Nội dung yêu cầu hoặc nhắc tới mã xác thực OTP bảo mật." },
+        { keywords: ["mat khau", "mật khẩu", "cap mat khau", "cung cap mat khau"], weight: 30, reason: "Nội dung yêu cầu hoặc nhắc tới mật khẩu tài khoản." },
+        { keywords: ["bi khoa", "bị khóa", "khoa tai khoan", "khóa tài khoản", "sap bi khoa"], weight: 25, reason: "Đe dọa tài khoản ngân hàng / mạng xã hội sắp bị khóa khẩn cấp." },
+        { keywords: ["cong an", "công an", "toa an", "tòa án", "vien kiem sat", "viện kiểm sát", "lenh bat"], weight: 35, reason: "Mạo danh cơ quan công an, tòa án, đe dọa lệnh bắt giam." },
+        { keywords: ["trung thuong", "trúng thưởng", "nhan thuong", "nhận thưởng", "qua tri an", "quà tri ân"], weight: 25, reason: "Dụ dỗ nhận quà trúng thưởng giá trị cao." },
+        { keywords: ["viec nhe luong cao", "việc nhẹ lương cao", "nap tien lam nhiem vu", "nạp tiền"], weight: 25, reason: "Dấu hiệu bẫy tuyển dụng việc nhẹ lương cao / nạp tiền làm nhiệm vụ." },
+        { keywords: ["click vao link", "nhap vao link", "truy cap link", "link", "http", "nhan-qua"], weight: 20, reason: "Dẫn dụ nhấp vào đường dẫn liên kết lạ không rõ nguồn gốc." },
+        { keywords: ["chuyen tien", "chuyển tiền", "hoan tien", "hoàn tiền", "mhoan tien"], weight: 20, reason: "Yêu cầu thực hiện giao dịch chuyển tiền khẩn cấp." }
     ];
 
     let riskScore = 0;
 
     for (const rule of scamRules) {
-        if (cleanText.includes(rule.keyword)) {
-            riskScore += rule.weight;
-            matchedKeywords.push(rule.keyword);
-            reasons.push(rule.reason);
+        for (const kw of rule.keywords) {
+            if (cleanText.includes(kw)) {
+                riskScore += rule.weight;
+                matchedKeywords.push(kw);
+                reasons.push(rule.reason);
+                break;
+            }
         }
     }
+
+    if (riskScore > 100) riskScore = 100;
 
     let isScam = false;
     let isSuspicious = false;
     let riskLevel = "LOW";
 
-    if (riskScore >= 5) {
+    if (riskScore >= 70) {
         isScam = true;
         isSuspicious = true;
         riskLevel = "CRITICAL";
-        reasons.unshift("Cảnh báo khẩn cấp: Nội dung có dấu hiệu lừa đảo chiếm đoạt tài khoản hoặc mạo danh cơ quan pháp luật!");
-    } else if (riskScore >= 3) {
+        reasons.unshift("Cảnh báo khẩn cấp: Tin nhắn có nhiều dấu hiệu kịch bản lừa đảo chiếm đoạt tài khoản hoặc mạo danh cơ quan chức năng!");
+    } else if (riskScore >= 40) {
+        isScam = true;
+        isSuspicious = true;
+        riskLevel = "HIGH";
+        reasons.unshift("Cảnh báo: Nội dung chứa từ khóa đáng nghi ngờ. Cần cảnh giác cao độ.");
+    } else if (riskScore >= 20) {
         isSuspicious = true;
         riskLevel = "MEDIUM";
-        reasons.unshift("Chú ý: Nội dung mang dấu hiệu dụ dỗ trúng thưởng, tạo sự khẩn cấp hoặc yêu cầu thông tin nhạy cảm.");
+        reasons.unshift("Chú ý: Nội dung chứa từ khóa nhạy cảm, cần xác minh kỹ trước khi thực hiện.");
     } else {
         reasons.push("Chưa phát hiện từ khóa nguy hiểm từ kịch bản phân tích văn bản.");
+    }
+
+    let recommendation = "Chưa phát hiện dấu hiệu lừa đảo. Cần cảnh giác khi nhận tin nhắn lạ.";
+    if (riskLevel === "CRITICAL" || riskLevel === "HIGH") {
+        recommendation = "Tuyệt đối không cung cấp mã OTP, mật khẩu, không nhấp link lạ và không chuyển tiền theo hướng dẫn trong tin nhắn!";
     }
 
     return {
         valid: true,
         normalizedContent: inputText.trim(),
+        risk_score: riskScore,
         riskLevel,
+        risk_level: riskLevel,
         isSuspicious,
         isScam,
         riskScore,
         reasons,
-        matchedKeywords
+        detection_reasons: reasons,
+        matchedKeywords,
+        recommendation
     };
 }
 

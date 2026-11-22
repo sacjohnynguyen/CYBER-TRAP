@@ -152,6 +152,14 @@ public class BaoCaoActivity extends AppCompatActivity {
             String token = prefs.getString("ACCESS_TOKEN", null);
             String loggedUser = prefs.getString("LOGGED_USER", "default");
 
+            // Tăng số lượng Thống kê Báo cáo hôm nay (+1) và Số đã chặn (+1)
+            SharedPreferences stats = getSharedPreferences("CyberTrapStats", MODE_PRIVATE);
+            int reportsCount = stats.getInt("STAT_REPORTS", 0);
+            int blockedCount = stats.getInt("STAT_BLOCKED", 0);
+            stats.edit()
+                    .putInt("STAT_REPORTS", reportsCount + 1)
+                    .putInt("STAT_BLOCKED", blockedCount + 1)
+                    .apply();
             String targetType = mapTargetType(type, target);
             String finalDesc = desc.isEmpty() ? "Không có mô tả thêm." : desc;
             ReportRequest request = new ReportRequest(target, targetType, type, finalDesc, 0);

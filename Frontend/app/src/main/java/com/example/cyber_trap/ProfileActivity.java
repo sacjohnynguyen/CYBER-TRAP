@@ -15,7 +15,7 @@ import com.google.android.material.button.MaterialButton;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    private TextView tvAvatarInitials, tvUserName, tvUserEmail, tvStatPosts;
+    private TextView tvAvatarInitials, tvUserName, tvUserEmail, tvStatPosts, tvStatReports;
     private SharedPreferences prefs;
 
     @Override
@@ -29,6 +29,7 @@ public class ProfileActivity extends AppCompatActivity {
         tvUserName = findViewById(R.id.tvUserName);
         tvUserEmail = findViewById(R.id.tvUserEmail);
         tvStatPosts = findViewById(R.id.tvStatPosts);
+        tvStatReports = findViewById(R.id.tvStatReports);
 
         loadUserInfo();
 
@@ -94,15 +95,20 @@ public class ProfileActivity extends AppCompatActivity {
         if (tvStatPosts != null) {
             tvStatPosts.setText(String.valueOf(NewsFeedActivity.allPosts.size()));
         }
+        if (tvStatReports != null) {
+            SharedPreferences stats = getSharedPreferences("CyberTrapStats", MODE_PRIVATE);
+            int reportsCount = stats.getInt("STAT_REPORTS", 0);
+            tvStatReports.setText(String.valueOf(reportsCount));
+        }
     }
 
     private void loadUserInfo() {
-        String name = prefs.getString("user_name", "Người dùng CYBER-TRAP");
-        String email = prefs.getString("user_email", "nguoidung@gmail.com");
+        String name = UserUtils.getLoggedUsername(this);
+        String email = UserUtils.getLoggedUserEmail(this);
 
         tvUserName.setText(name);
         tvUserEmail.setText(email);
-        tvAvatarInitials.setText(getInitials(name));
+        tvAvatarInitials.setText(UserUtils.getInitials(name));
     }
 
     private void showEditProfileDialog() {

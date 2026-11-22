@@ -16,6 +16,7 @@ public class Post {
     public int likeCount;
     public int commentCount;
     public boolean isLiked;
+    public boolean isSaved;
     public boolean isOwner;
     public List<Comment> comments;
     public String privacy;
@@ -36,5 +37,31 @@ public class Post {
         this.isOwner = isOwner;
         this.comments = new ArrayList<>();
         this.privacy = "Công khai";
+    }
+
+    public ArrayList<String> imageUriStrings;
+
+    public void syncImageStrings() {
+        if (imageUriStrings == null) imageUriStrings = new ArrayList<>();
+        imageUriStrings.clear();
+        if (imageUris != null) {
+            for (Uri uri : imageUris) {
+                if (uri != null) imageUriStrings.add(uri.toString());
+            }
+        }
+    }
+
+    public void restoreImageUris() {
+        if (imageUris == null) imageUris = new ArrayList<>();
+        if (imageUriStrings != null) {
+            imageUris.clear();
+            for (String str : imageUriStrings) {
+                if (str != null && !str.trim().isEmpty()) {
+                    try {
+                        imageUris.add(Uri.parse(str));
+                    } catch (Exception ignored) {}
+                }
+            }
+        }
     }
 }

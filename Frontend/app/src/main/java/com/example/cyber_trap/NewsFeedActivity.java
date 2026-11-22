@@ -75,6 +75,7 @@ public class NewsFeedActivity extends AppCompatActivity {
                         .setMessage("Bạn có muốn xóa bài viết này không?")
                         .setPositiveButton("Xóa", (dialog, which) -> {
                             allPosts.remove(post);
+                            ForumCacheManager.savePosts(NewsFeedActivity.this, allPosts);
                             filterPosts();
                             Toast.makeText(NewsFeedActivity.this, "Đã xóa bài viết", Toast.LENGTH_SHORT).show();
                         })
@@ -132,6 +133,7 @@ public class NewsFeedActivity extends AppCompatActivity {
         findViewById(R.id.chipAll).setOnClickListener(v -> { currentTagFilter = ""; filterPosts(); });
         findViewById(R.id.chipBank).setOnClickListener(v -> { currentTagFilter = "#GiaMaoNganHang"; filterPosts(); });
         findViewById(R.id.chipJob).setOnClickListener(v -> { currentTagFilter = "#ViecNheLuongCao"; filterPosts(); });
+        findViewById(R.id.chipSaved).setOnClickListener(v -> { currentTagFilter = "#SAVED#"; filterPosts(); });
 
         MaterialCardView cardCreatePost = findViewById(R.id.cardCreatePost);
         cardCreatePost.setOnClickListener(v -> {
@@ -169,14 +171,130 @@ public class NewsFeedActivity extends AppCompatActivity {
                 startActivity(intent);
             });
         }
+
+        View btnNotifyContainer = findViewById(R.id.btnNotifyContainer);
+        if (btnNotifyContainer != null) {
+            btnNotifyContainer.setOnClickListener(v -> showNotificationBottomSheet());
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        if (allPosts.isEmpty()) {
+            List<Post> cached = ForumCacheManager.loadPosts(this);
+            if (!cached.isEmpty()) {
+                allPosts.addAll(cached);
+            }
+        }
+        updateUserAvatars();
+        updateNotificationBadge();
         filterPosts();
         if (!displayedPosts.isEmpty()) {
             rvPosts.scrollToPosition(0);
+        }
+    }
+
+    private void updateNotificationBadge() {
+        TextView tvNotifyBadge = findViewById(R.id.tvNotifyBadge);
+        if (tvNotifyBadge != null) {
+            int unread = NotificationManager.getUnreadCount(this);
+            if (unread > 0) {
+                tvNotifyBadge.setVisibility(View.VISIBLE);
+                tvNotifyBadge.setText(String.valueOf(unread));
+            } else {
+                tvNotifyBadge.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    private void showNotificationBottomSheet() {
+        com.google.android.material.bottomsheet.BottomSheetDialog dialog =
+                new com.google.android.material.bottomsheet.BottomSheetDialog(this);
+        View view = getLayoutInflater().inflate(R.layout.layout_notification_bottom_sheet, null);
+        dialog.setContentView(view);
+
+        RecyclerView rvNotifs = view.findViewById(R.id.rvNotifList);
+        LinearLayout layoutEmpty = view.findViewById(R.id.layoutEmptyNotif);
+        TextView btnMarkAllRead = view.findViewById(R.id.btnMarkAllRead);
+        TextView tabAll = view.findViewById(R.id.tabAllNotifs);
+        TextView tabUnread = view.findViewById(R.id.tabUnreadNotifs);
+
+        rvNotifs.setLayoutManager(new LinearLayoutManager(this));
+
+        List<NotificationItem> allNotifs = NotificationManager.getNotifications(this);
+        List<NotificationItem> displayNotifs = new ArrayList<>(allNotifs);
+
+        NotificationAdapter notifAdapter = new NotificationAdapter(this, displayNotifs, item -> {
+            NotificationManager.markAsRead(this, item.id);
+            updateNotificationBadge();
+            dialog.dismiss();
+            if (item.postPosition >= 0 && item.postPosition < allPosts.size()) {
+                Intent intent = new Intent(NewsFeedActivity.this, PostDetailActivity.class);
+                intent.putExtra("POST_POSITION", item.postPosition);
+                startActivity(intent);
+            }
+        });
+        rvNotifs.setAdapter(notifAdapter);
+
+        if (displayNotifs.isEmpty()) {
+            layoutEmpty.setVisibility(View.VISIBLE);
+            rvNotifs.setVisibility(View.GONE);
+        } else {
+            layoutEmpty.setVisibility(View.GONE);
+            rvNotifs.setVisibility(View.VISIBLE);
+        }
+
+        tabAll.setOnClickListener(v1 -> {
+            tabAll.setBackgroundColor(android.graphics.Color.parseColor("#E7F3FF"));
+            tabAll.setTextColor(android.graphics.Color.parseColor("#1877F2"));
+            tabUnread.setBackgroundColor(android.graphics.Color.parseColor("#F0F2F5"));
+            tabUnread.setTextColor(android.graphics.Color.parseColor("#65676B"));
+            displayNotifs.clear();
+            displayNotifs.addAll(NotificationManager.getNotifications(this));
+            notifAdapter.notifyDataSetChanged();
+            layoutEmpty.setVisibility(displayNotifs.isEmpty() ? View.VISIBLE : View.GONE);
+            rvNotifs.setVisibility(displayNotifs.isEmpty() ? View.GONE : View.VISIBLE);
+        });
+
+        tabUnread.setOnClickListener(v2 -> {
+            tabUnread.setBackgroundColor(android.graphics.Color.parseColor("#E7F3FF"));
+            tabUnread.setTextColor(android.graphics.Color.parseColor("#1877F2"));
+            tabAll.setBackgroundColor(android.graphics.Color.parseColor("#F0F2F5"));
+            tabAll.setTextColor(android.graphics.Color.parseColor("#65676B"));
+            displayNotifs.clear();
+            for (NotificationItem item : NotificationManager.getNotifications(this)) {
+                if (!item.isRead) displayNotifs.add(item);
+            }
+            notifAdapter.notifyDataSetChanged();
+            layoutEmpty.setVisibility(displayNotifs.isEmpty() ? View.VISIBLE : View.GONE);
+            rvNotifs.setVisibility(displayNotifs.isEmpty() ? View.GONE : View.VISIBLE);
+        });
+
+        btnMarkAllRead.setOnClickListener(v3 -> {
+            NotificationManager.markAllAsRead(this);
+            updateNotificationBadge();
+            displayNotifs.clear();
+            displayNotifs.addAll(NotificationManager.getNotifications(this));
+            notifAdapter.notifyDataSetChanged();
+            Toast.makeText(this, "Đã đánh dấu tất cả là đã đọc", Toast.LENGTH_SHORT).show();
+        });
+
+        dialog.show();
+    }
+
+    private void updateUserAvatars() {
+        String loggedUser = UserUtils.getLoggedUsername(this);
+        String initials = UserUtils.getInitials(loggedUser);
+
+        TextView tvHeaderAvatarText = findViewById(R.id.tvHeaderAvatarText);
+        if (tvHeaderAvatarText != null) {
+            tvHeaderAvatarText.setText(initials);
+        }
+
+        TextView tvCreatePostAvatarText = findViewById(R.id.tvCreatePostAvatarText);
+        if (tvCreatePostAvatarText != null) {
+            tvCreatePostAvatarText.setText(initials);
         }
     }
 
@@ -189,7 +307,13 @@ public class NewsFeedActivity extends AppCompatActivity {
                     || post.title.toLowerCase().contains(keyword)
                     || post.content.toLowerCase().contains(keyword)
                     || post.tag.toLowerCase().contains(keyword);
-            boolean matchTag = currentTagFilter.isEmpty() || post.tag.equalsIgnoreCase(currentTagFilter);
+
+            boolean matchTag;
+            if ("#SAVED#".equals(currentTagFilter)) {
+                matchTag = post.isSaved;
+            } else {
+                matchTag = currentTagFilter.isEmpty() || post.tag.equalsIgnoreCase(currentTagFilter);
+            }
 
             if (matchKeyword && matchTag) {
                 displayedPosts.add(post);
